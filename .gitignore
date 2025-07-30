@@ -355,9 +355,22 @@ outputs
 .history
 
 # Below are all added by Reasoning360
+
+# Allow key project helper files at repo root
+!ENVIRONMENT_USAGE.md
+!setup_arc_env.sh
+!submit_gpu_job.sh
+
+# Ignore project-specific virtual environment directory
+venv_reasoning360mtl/
 # Ignore all files in root directory, but keep directories
 /*
 !/*/
+
+# Explicitly keep helper scripts and docs in repo root
+!ENVIRONMENT_USAGE.md
+!setup_arc_env.sh
+!submit_gpu_job.sh
 
 # But keep these important files/directories
 !/README*
