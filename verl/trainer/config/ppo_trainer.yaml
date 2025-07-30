@@ -47,7 +47,7 @@ actor_rollout_ref:
     ppo_micro_batch_size_per_gpu: null
     use_dynamic_bsz: False
     ppo_max_token_len_per_gpu: 32768 # n * ${data.max_prompt_length} + ${data.max_response_length}
-    grad_clip: 1.0
+    grad_clip: 1.0  # Global gradient clipping for stable MTL training
     # pg_losses2 = -advantages * torch.clamp(ratio, 1 - cliprange_low, 1 + cliprange_high)
     clip_ratio: 0.2 # default value if clip_ratio_low and clip_ratio_high are not specified
     clip_ratio_low: 0.2
@@ -253,6 +253,12 @@ algorithm:
     enable: False # We try to avoid forgetting to set enable
     metric: null # acc / score / seq_reward / seq_final_reward / ...
     max_num_gen_batches: 0 # Non-positive values mean no upper limit
+
+mtl:
+  enabled: false              # flip to true via CLI
+  method: pcgrad              # pcgrad | equal
+  num_tasks_expected: 6       # only used by "wait for all" strategy
+  ensure_all_tasks_per_step: true     # optional; safe default
 
 trainer:
   balance_batch: True

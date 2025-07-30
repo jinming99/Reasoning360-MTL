@@ -63,6 +63,7 @@ from verl.utils.fsdp_utils import (
 from verl.utils.import_utils import import_external_libs
 from verl.utils.model import compute_position_id_with_mask
 from verl.utils.py_functional import convert_to_regular_types
+from verl.utils.mtl_utils import PCGrad
 from verl.workers.sharding_manager.fsdp_ulysses import FSDPUlyssesShardingManager
 
 logger = logging.getLogger(__file__)
@@ -161,6 +162,14 @@ class ActorRolloutRefWorker(Worker):
         if self._is_ref and self.config.ref.log_prob_micro_batch_size is not None:
             self.config.ref.log_prob_micro_batch_size //= self.device_mesh.size() // self.ulysses_sequence_parallel_size
             self.config.ref.log_prob_micro_batch_size_per_gpu = self.config.ref.log_prob_micro_batch_size
+        
+        # Store gradient clipping value
+        self.grad_clip_val = (
+    self.config.actor_rollout_ref.actor.get("grad_clip", 1.0)
+    if "actor_rollout_ref" in self.config
+    else self.config.actor.get("grad_clip", 1.0)
+)
+
 
     def _build_model_optimizer(
         self,
@@ -348,6 +357,10 @@ class ActorRolloutRefWorker(Worker):
                 betas=optim_config.get("betas", (0.9, 0.999)),
                 weight_decay=optim_config.get("weight_decay", 1e-2),
             )
+            
+            # Wrap optimizer with PCGrad if MTL is enabled
+            if role == "actor" and self.config.get("mtl", {}).get("method") == "pcgrad":
+                actor_optimizer = PCGrad(actor_optimizer)
 
             total_steps = optim_config.get("total_training_steps", 0)
             num_warmup_steps = int(optim_config.get("lr_warmup_steps", -1))
@@ -578,10 +591,41 @@ class ActorRolloutRefWorker(Worker):
 
         with self.ulysses_sharding_manager:
             data = self.ulysses_sharding_manager.preprocess_data(data=data)
-            # perform training
-            with Timer(name="update_policy", logger=None) as timer:
-                metrics = self.actor.update_policy(data=data)
-            delta_time = timer.last
+            
+            # ------------------------------------------------------------------------------
+            per_task = data.meta_info.pop("task_batches", None)
+
+            if per_task is None:                    # === single task path ===
+                with Timer(name="update_policy", logger=None) as timer:
+                    metrics = self.actor.update_policy(data=data)
+
+            else:                                   # === multi task path ===
+                with Timer(name="update_policy_mtl", logger=None) as timer:
+                    opt = self.actor_optimizer       # PCGrad wrapped if cfg says so
+                    opt.zero_grad()
+
+                    losses = [self.actor.compute_policy_loss(b) for b in per_task.values()]
+
+                    if self.config.get("mtl", {}).get("method") == "pcgrad" and hasattr(opt, "pc_backward"):
+                        opt.pc_backward(losses)
+                    else:                                      # equal weighting
+                        torch.stack(losses).mean().backward()
+
+                    torch.nn.utils.clip_grad_norm_(
+                        self.actor_module_fsdp.parameters(), self.grad_clip_val
+                    )
+                    opt.step()
+                    self.actor_lr_scheduler.step()
+
+                    metrics = {
+                        "actor/loss": torch.stack(losses).mean().item(),
+                        "actor/num_tasks": len(losses),
+                    }
+                    for tname, l in zip(per_task.keys(), losses):
+                        metrics[f"actor/{tname}_loss"] = l.item()
+            # ------------------------------------------------------------------------------
+            
+            delta_time = getattr(timer, "last", 0.0)
             global_num_tokens = data.meta_info["global_token_num"]
             estimated_flops, promised_flops = self.flops_counter.estimate_flops(global_num_tokens, delta_time)
             metrics["perf/mfu/actor"] = estimated_flops * self.config.actor.ppo_epochs / promised_flops / self.world_size
@@ -591,7 +635,6 @@ class ActorRolloutRefWorker(Worker):
 
             lr = self.actor_lr_scheduler.get_last_lr()[0]
             metrics["actor/lr"] = lr
-            self.actor_lr_scheduler.step()
 
             # TODO: here, we should return all metrics
             output = DataProto(meta_info={"metrics": metrics})

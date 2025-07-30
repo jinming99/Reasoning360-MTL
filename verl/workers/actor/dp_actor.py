@@ -28,7 +28,11 @@ from torch.distributed.fsdp import FullyShardedDataParallel as FSDP
 
 import verl.utils.torch_functional as verl_F
 from verl import DataProto
-from verl.trainer.ppo.core_algos import agg_loss, compute_policy_loss, kl_penalty
+from verl.trainer.ppo.core_algos import (
+    agg_loss,
+    compute_policy_loss as ppo_compute_loss,     # alias to avoid name clash
+    kl_penalty,
+)
 from verl.utils.debug import GPUMemoryLogger
 from verl.utils.device import get_device_name, get_torch_device, is_cuda_available, is_npu_available
 from verl.utils.fsdp_utils import FSDPModule, fsdp2_clip_grad_norm_
@@ -388,7 +392,7 @@ class DataParallelPPOActor(BasePPOActor):
                         calculate_entropy = True
                     entropy, log_prob = self._forward_micro_batch(micro_batch=data, temperature=temperature, calculate_entropy=calculate_entropy)
 
-                    pg_loss, pg_clipfrac, ppo_kl, pg_clipfrac_lower = compute_policy_loss(
+                    pg_loss, pg_clipfrac, ppo_kl, pg_clipfrac_lower = ppo_compute_loss(
                         old_log_prob=old_log_prob,
                         log_prob=log_prob,
                         advantages=advantages,
@@ -414,9 +418,11 @@ class DataParallelPPOActor(BasePPOActor):
                         kld = kl_penalty(logprob=log_prob, ref_logprob=ref_log_prob, kl_penalty=self.config.kl_loss_type)
                         kl_loss = agg_loss(loss_mat=kld, loss_mask=response_mask, loss_agg_mode=loss_agg_mode)
 
-                        policy_loss = policy_loss + kl_loss * self.config.kl_loss_coef
+                        policy_loss = policy_loss + kl_loss * self.config.get("kl_loss_coef", 0.001)
+                        """
                         metrics["actor/kl_loss"] = kl_loss.detach().item()
                         metrics["actor/kl_coef"] = self.config.kl_loss_coef
+                        """
 
                     if self.config.use_dynamic_bsz:
                         # relative to the dynamic bsz
@@ -438,3 +444,68 @@ class DataParallelPPOActor(BasePPOActor):
                 append_to_dict(metrics, data)
         self.actor_optimizer.zero_grad()
         return metrics
+    
+    def compute_policy_loss(self, data: DataProto):
+        """
+        PPO policy loss only – no optimiser step.
+        Mirrors `update_policy()` logic without gradient accumulation or optimizer update.
+        
+        Args:
+            data (DataProto): Must contain the following in data.batch:
+                - input_ids: Input token IDs
+                - attention_mask: Attention mask
+                - responses: Response token IDs (used if 'actions' not provided)
+                - old_log_probs: Log probs from old policy
+                - advantages: Advantage estimates
+                - [optional] actions: Action token IDs (fallback to responses if not provided)
+                - [optional] ref_log_prob: Reference policy log probs (if using KL loss)
+        """
+        # Forward pass
+        out = self.actor_module(data.batch)
+
+        # Response length and mask
+        resp_len = data.batch["old_log_probs"].size(1)
+        response_mask = data.batch["attention_mask"][:, -resp_len:]
+
+        # Clip ranges
+        cr = self.config.clip_ratio
+        cr_low = self.config.get("clip_ratio_low", cr)
+        cr_high = self.config.get("clip_ratio_high", cr)
+        cr_c = self.config.get("clip_ratio_c", 3.0)
+
+        # Log-probs of current policy for response tokens (exclude BOS & terminal padding)
+        logits = out["logits"][:, -resp_len-1:-1, :]
+        actions = data.batch.get("actions", data.batch["responses"])
+        log_prob = logprobs_from_logits(logits, actions)
+
+        # PPO clipped policy gradient loss
+        pg_loss, *_ = ppo_compute_loss(
+            old_log_prob=data.batch["old_log_probs"],
+            log_prob=log_prob,
+            advantages=data.batch["advantages"],
+            response_mask=response_mask,
+            cliprange=cr,
+            cliprange_low=cr_low,
+            cliprange_high=cr_high,
+            clip_ratio_c=cr_c,
+            loss_agg_mode=self.config.get("loss_agg_mode", "mean"),
+        )
+
+        # Entropy bonus (optional)
+        ent_coeff = self.config.get("entropy_coeff", 0.0)
+        if ent_coeff > 0:
+            ent = agg_loss(verl_F.entropy_from_logits(logits), response_mask, 
+                         self.config.get("loss_agg_mode", "mean"))
+            pg_loss = pg_loss - ent_coeff * ent
+
+        # KL penalty to reference policy (optional)
+        if self.config.get("use_kl_loss", False) and "ref_log_prob" in data.batch:
+            kld = kl_penalty(
+                logprob=log_prob,
+                ref_logprob=data.batch["ref_log_prob"],
+                kl_penalty=self.config.get("kl_loss_type", "kl"),
+            )
+            kl_loss = agg_loss(kld, response_mask, self.config.get("loss_agg_mode", "mean"))
+            pg_loss = pg_loss + kl_loss * self.config.get("kl_loss_coef", 0.001)
+
+        return pg_loss
