@@ -27,7 +27,7 @@ data:
 actor_rollout_ref:
   hybrid_engine: True
   model:
-    path: ~/models/deepseek-llm-7b-chat
+    path: /home/jinming/llm_models/Qwen2.5-7B
     use_shm: False
     external_lib: null
     override_config: { }
@@ -114,7 +114,7 @@ actor_rollout_ref:
     free_cache_engine: True
     load_format: dummy_dtensor  # safetensors (for huge model, and set use_shm=True); dummy_dtensor: randomly init model weight
     layered_summon: False # for huge model, layered summon can save memory (prevent OOM) but make it slower
-    tensor_model_parallel_size: 2
+    tensor_model_parallel_size: 1
     max_num_batched_tokens: 8192
     max_model_len: null
     max_num_seqs: 1024
@@ -157,7 +157,7 @@ critic:
     total_training_steps: -1  # must be override by program
     weight_decay: 0.01
   model:
-    path: ~/models/deepseek-llm-7b-chat
+    path: /home/jinming/llm_models/Qwen2.5-7B
     use_shm: False
     tokenizer_path: ${actor_rollout_ref.model.path}
     override_config: { }

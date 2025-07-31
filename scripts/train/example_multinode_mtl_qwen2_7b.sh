@@ -31,15 +31,14 @@ export UCX_NET_DEVICES=mlx5_0:1,mlx5_1:1,mlx5_2:1,mlx5_3:1,mlx5_4:1,mlx5_5:1,mlx
 SHARED_DATA_PATH=./data
 
 # Map tasks to individual dataset files
-
-TRAIN_FILES='{
-  "math":"'"${SHARED_DATA_PATH}"'/train/guru_18k/math.parquet",
-  "codegen":"'"${SHARED_DATA_PATH}"'/train/guru_18k/codegen.parquet",
-  "logic":"'"${SHARED_DATA_PATH}"'/train/guru_18k/logic.parquet",
-  "simulation":"'"${SHARED_DATA_PATH}"'/train/guru_18k/simulation.parquet",
-  "table":"'"${SHARED_DATA_PATH}"'/train/guru_18k/table.parquet",
-  "stem":"'"${SHARED_DATA_PATH}"'/train/guru_18k/stem.parquet"
-}'
+TRAIN_FILES="{
+  'math':'${SHARED_DATA_PATH}/train/guru_18k/math.parquet',
+  'codegen':'${SHARED_DATA_PATH}/train/guru_18k/codegen.parquet',
+  'logic':'${SHARED_DATA_PATH}/train/guru_18k/logic.parquet',
+  'simulation':'${SHARED_DATA_PATH}/train/guru_18k/simulation.parquet',
+  'table':'${SHARED_DATA_PATH}/train/guru_18k/table.parquet',
+  'stem':'${SHARED_DATA_PATH}/train/guru_18k/stem.parquet'
+}"
 
 # Base model
 BASE_MODEL=Qwen/Qwen2.5-7B
@@ -78,11 +77,13 @@ done
 sleep 10
 
 # Launch training with the standard PPO trainer (MTL is handled via config)
+# Use ppo_trainer.yaml as base config, consistent with smoke test
 srun --jobid ${SLURM_JOBID} --kill-on-bad-exit=1 \
     python -u -m verl.trainer.main_ppo \
+    --config-name=ppo_trainer \
     algorithm.adv_estimator=grpo \
-    data.train_files=$TRAIN_FILES \
-    data.val_files="[]" \
+    data.train_files="$TRAIN_FILES" \
+    data.val_files="[/home/jinming/Reasoning360-MTL/data/train/guru_18k/math.parquet]" \
     data.train_batch_size=$TRAIN_PROMPT_BSZ \
     data.max_prompt_length=$MAX_PROMPT_LENGTH \
     data.max_response_length=$MAX_RESPONSE_LENGTH \

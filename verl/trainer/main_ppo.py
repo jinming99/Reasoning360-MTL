@@ -190,7 +190,7 @@ def create_rl_dataset(data_paths, data_config, tokenizer, processor):
     return dataset
 
 
-def create_rl_sampler(data_config, dataset):
+def create_rl_sampler(data_config, dataset, **_unused):
     """Create a sampler for the dataset.
 
     Arguments:

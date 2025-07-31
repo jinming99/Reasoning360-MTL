@@ -11,29 +11,37 @@ set -euo pipefail
 # --------------------------------------------------------------------------- #
 # 1. User‑editable paths                                                      #
 # --------------------------------------------------------------------------- #
+# Disable flash attention at the environment level
+export FLASH_ATTENTION_DISABLE=1
+export FLASH_ATTENTION_DISABLED=1
+
 export CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES:-0}
 
 # Absolute paths are safer than $PWD inside YAML interpolations
 PROJECT_ROOT=$(realpath "$(dirname "${BASH_SOURCE[0]}")/..")
 DATA_DIR="$PROJECT_ROOT/../data/train/guru_18k"  # Go up one more level from scripts/ to project root
-MODEL_DIR="$HOME/models/Qwen2.5-7B"              # adjust if needed
+MODEL_DIR="/home/jinming/llm_models/Qwen2.5-7B"              # adjust if needed
 
 # Hydra/WandB logs will land here
 CHECKPOINT_DIR="$PROJECT_ROOT/checkpoints/smoke_test"
 
 # Activate conda environment
-source $(conda info --base)/etc/profile.d/conda.sh
-conda activate Reasoning360 || {
-    echo "Error: Failed to activate conda environment 'Reasoning360'"
-    exit 1
-}
+# Use current virtual environment (assumes setup_arc_env.sh was run)
+PYTHON_BIN="/home/jinming/Reasoning360-MTL/venv_reasoning360mtl/bin/python"
+export RAY_PYTHON_EXECUTABLE="$PYTHON_BIN"
+RAY_BIN="$(dirname "$PYTHON_BIN")/ray"
+if [ ! -x "$RAY_BIN" ]; then
+  # Fallback to invoking Ray via Python module
+  RAY_BIN="$PYTHON_BIN -m ray"
+fi
 
-# Set paths to conda binaries
-RAY_BIN="$CONDA_PREFIX/bin/ray"
-PYTHON_BIN="$CONDA_PREFIX/bin/python"
+# Skip Ray startup if user provides external cluster address
+if [ -n "${RAY_ADDRESS:-}" ]; then
+  SKIP_RAY_START=1
+fi
 
 # Check for required Python packages
-REQUIRED_PKGS=("numpy" "torch" "transformers" "ray")
+REQUIRED_PKGS=("numpy" "torch" "transformers" "ray" "pandas" "numba")
 for pkg in "${REQUIRED_PKGS[@]}"; do
     if ! $PYTHON_BIN -c "import $pkg" &> /dev/null; then
         echo "Installing missing package: $pkg"
@@ -92,6 +100,11 @@ actor_rollout_ref:
     max_tokens: 128
     stop_token_ids: null
     stop: []
+    gpu_memory_utilization: 0.2
+    max_model_len: 384
+    enforce_eager: true
+    max_num_batched_tokens: 512
+    load_format: dummy_dtensor
 
 trainer:
   n_gpus_per_node: 1
@@ -133,26 +146,83 @@ ray_init:
 YAML
 
 # Ensure we remove the temporary file even on Ctrl‑C
-trap 'rm -f "$TMP_OVR"; $RAY_BIN stop >/dev/null 2>&1 || true' EXIT INT TERM
+# Updated trap to only stop Ray if we started it
+trap 'rm -f "$TMP_OVR"; [ -z "${SKIP_RAY_START:-}" ] && $RAY_BIN stop >/dev/null 2>&1 || true' EXIT INT TERM
 
 # --------------------------------------------------------------------------- #
 # 4. Start a throw‑away Ray head                                              #
 # --------------------------------------------------------------------------- #
-$RAY_BIN stop >/dev/null 2>&1 || true
-$RAY_BIN start --head --num-cpus=4 --num-gpus=1 --block &   # --block keeps the daemon in background
-sleep 5
+# Get the Ethernet IP address (not InfiniBand)
+HOST_IP=$(hostname --ip-address | awk '{print $1}')
+
+if [ -z "${SKIP_RAY_START:-}" ]; then
+  echo "Starting Ray head on $HOST_IP:6379..."
+  $RAY_BIN stop >/dev/null 2>&1 || true
+  $RAY_BIN start --head \
+                 --node-ip-address="$HOST_IP" \
+                 --port=6379 \
+                 --num-cpus=4 \
+                 --num-gpus=1 &
+  sleep 5
+  export RAY_ADDRESS=${HOST_IP}:6379
+  echo "Ray head started at $RAY_ADDRESS"
+  
+  # Verify Ray is running
+  if ! $RAY_BIN status >/dev/null 2>&1; then
+    echo "Error: Ray failed to start properly"
+    exit 1
+  fi
+fi
 
 # --------------------------------------------------------------------------- #
 # 5. Launch training                                                          #
 # --------------------------------------------------------------------------- #
+# Below we pass a small set of overrides that are REQUIRED for the trainer to
+# start.  The values come from sensible defaults used in
+#   - verl/trainer/config/ppo_megatron_trainer_edited.yaml  (micro-batch sizes)
+#   - verl/trainer/config/generation.yaml                  (log-prob micro-batch)
+# They are kept here in-line so that anyone reading this script sees exactly
+# which hyper-parameters differ from the base `ppo_trainer.yaml`.
+#   data.train_files / data.val_files  – point to the GURU-18K subsets we created
+#   data.train_batch_size             – minimal batch divisible by mini-batches
+#   actor_rollout_ref.actor.ppo_micro_batch_size_per_gpu   – per-GPU micro-batch
+#   actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu – micro-batch used
+#        when re-computing log-probs for KL / PPO loss
+#   actor_rollout_ref.rollout.n       – number of responses per prompt (1 for smoke)
+#   model & tokenizer paths           – local Qwen2.5-7B checkout
+# If you need to change GPUs or dataset size, adjust *train_batch_size* and both
+# micro-batch sizes accordingly (they must cleanly divide the global batch).
+
 # Export the config path as an environment variable for Hydra to pick up
 export HYDRA_CONFIG_PATH="$TMP_OVR"
 
+# If RAY_ADDRESS is set, pass it to the trainer
+RAY_INIT_OVERRIDE=""
+if [ -n "${RAY_ADDRESS:-}" ]; then
+  RAY_INIT_OVERRIDE="+ray_init.address=$RAY_ADDRESS"
+fi
+
 $PYTHON_BIN -m verl.trainer.main_ppo \
   --config-name=ppo_trainer \
+  actor_rollout_ref.model.path="$MODEL_DIR" \
+  data.tokenizer="$MODEL_DIR" \
+  data.train_files="[/home/jinming/Reasoning360-MTL/data/train/guru_18k/math.parquet,/home/jinming/Reasoning360-MTL/data/train/guru_18k/logic.parquet]" \
+  data.val_files="[/home/jinming/Reasoning360-MTL/data/train/guru_18k/math.parquet]" \
   data.max_prompt_length=128 data.max_response_length=128 \
   data.train_batch_size=4 \
+  actor_rollout_ref.actor.ppo_mini_batch_size=2 \
+  actor_rollout_ref.actor.ppo_micro_batch_size_per_gpu=2 \
+  critic.ppo_micro_batch_size_per_gpu=2 \
+  actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=2 \
+  actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=2 \
   actor_rollout_ref.rollout.n=1 \
-  +wandb.mode=disabled
+  trainer.n_gpus_per_node=1 \
+  +trainer.ray_worker_group_cls.num_workers=2 \
+  +trainer.ray_worker_group_cls.num_gpus_per_worker=1 \
+  +wandb.mode=disabled \
+  ++trainer.ray_wait_register_center_timeout=300 \
+  ++actor_rollout_ref.model.enable_flash_attention=false \
+  ++critic.model.enable_flash_attention=false \
+  $RAY_INIT_OVERRIDE
 
 echo -e "\nSmoke test finished successfully 🎉"

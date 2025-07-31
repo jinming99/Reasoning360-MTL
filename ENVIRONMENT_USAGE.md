@@ -21,5 +21,28 @@ Run the installer any time you need a fresh venv:
 bash setup_arc_env.sh
 ```
 
+## 4. Ray cluster usage
+
+### Interactive (Remote-Desktop) debugging
+```bash
+# Inside your GPU node
+source ~/venv_reasoning360mtl/bin/activate
+ray stop -f                        # clean up any prior cluster
+PORT=6379
+ray start --head --port=$PORT \
+          --num-cpus 4 --num-gpus 1 --block &
+# Tell training scripts where the head is
+export RAY_ADDRESS="$(hostname --ip-address):$PORT"
+```
+All training scripts automatically:
+* Skip starting a new Ray cluster when `RAY_ADDRESS` is set.
+* Connect to the existing cluster via that address.
+
+### Batch jobs (Slurm)
+`scripts/train/example_multinode_mtl_qwen2_7b.sh` starts Ray on the first node
+and propagates the address to all workers. No manual steps required. If you
+prefer to supply your own cluster, simply export `RAY_ADDRESS` **before**
+invoking the script and it will join instead of starting a new one.
+
 ---
 Happy hacking!

@@ -42,8 +42,30 @@ from verl.utils.torch_functional import logprobs_from_logits
 from verl.utils.ulysses import gather_outpus_and_unpad, ulysses_pad, ulysses_pad_and_slice_inputs
 from verl.workers.actor import BasePPOActor
 
-if is_cuda_available:
+# Conditional import of flash_attn with fallback
+try:
     from flash_attn.bert_padding import index_first_axis, pad_input, rearrange, unpad_input
+    FLASH_ATTN_AVAILABLE = True
+except ImportError:
+    # Fallback implementations for when flash_attn is not available
+    def index_first_axis():
+        raise NotImplementedError("flash_attn not available")
+    
+    def pad_input():
+        raise NotImplementedError("flash_attn not available")
+    
+    def rearrange():
+        raise NotImplementedError("flash_attn not available")
+    
+    def unpad_input():
+        raise NotImplementedError("flash_attn not available")
+    
+    FLASH_ATTN_AVAILABLE = False
+
+# Use our conditional import instead of direct imports
+if is_cuda_available and FLASH_ATTN_AVAILABLE:
+    # flash_attn functions are already imported above
+    pass
 elif is_npu_available:
     from transformers.integrations.npu_flash_attention import index_first_axis, pad_input, rearrange, unpad_input
 

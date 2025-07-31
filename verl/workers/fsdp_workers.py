@@ -209,7 +209,8 @@ class ActorRolloutRefWorker(Worker):
             torch_dtype = PrecisionType.to_dtype(torch_dtype)
 
         # override model kwargs
-        actor_model_config = AutoConfig.from_pretrained(local_path, trust_remote_code=trust_remote_code, attn_implementation="flash_attention_2")
+        # Disable flash attention
+        actor_model_config = AutoConfig.from_pretrained(local_path, trust_remote_code=trust_remote_code, attn_implementation="eager")
 
         # patch for kimi-vl
         if getattr(actor_model_config, "model_type", None) == "kimi_vl":
@@ -237,11 +238,13 @@ class ActorRolloutRefWorker(Worker):
             else:
                 actor_module_class = AutoModelForCausalLM
 
+            # Explicitly disable flash attention
             actor_module = actor_module_class.from_pretrained(
                 pretrained_model_name_or_path=local_path,
                 torch_dtype=torch_dtype,
                 config=actor_model_config,
                 trust_remote_code=trust_remote_code,
+                attn_implementation="eager",  # Explicitly disable flash attention
             )
 
             # Apply Liger kernel to the model if use_liger is set to True
@@ -887,7 +890,8 @@ class CriticWorker(Worker):
 
         from transformers import AutoConfig, AutoModelForTokenClassification
 
-        critic_model_config = AutoConfig.from_pretrained(local_path, attn_implementation="flash_attention_2", trust_remote_code=config.model.get("trust_remote_code", False))
+        # Disable flash attention
+        critic_model_config = AutoConfig.from_pretrained(local_path, attn_implementation="eager", trust_remote_code=config.model.get("trust_remote_code", False))
         critic_model_config.num_labels = 1
         # patch for kimi-vl
         if getattr(critic_model_config, "model_type", None) == "kimi_vl":
@@ -899,11 +903,13 @@ class CriticWorker(Worker):
             warnings.simplefilter("ignore")
             critic_model_config.classifier_dropout = 0.0
             critic_model_config.hidden_dropout = "0"
+            # Explicitly disable flash attention
             critic_module = AutoModelForTokenClassification.from_pretrained(
                 pretrained_model_name_or_path=local_path,
                 torch_dtype=torch_dtype,
                 config=critic_model_config,
                 trust_remote_code=config.model.get("trust_remote_code", False),
+                attn_implementation="eager",  # Explicitly disable flash attention
             )
 
             use_remove_padding = config.model.get("use_remove_padding", False)

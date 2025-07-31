@@ -21,8 +21,28 @@ import os
 
 import torch
 import torch.distributed
-from flash_attn.bert_padding import (index_first_axis, pad_input, rearrange,
-                                     unpad_input)
+
+# Conditional import of flash_attn with fallback
+try:
+    from flash_attn.bert_padding import (index_first_axis, pad_input, rearrange,
+                                         unpad_input)
+    FLASH_ATTN_AVAILABLE = True
+except ImportError:
+    # Fallback implementations
+    def index_first_axis():
+        raise NotImplementedError("flash_attn not available")
+    
+    def pad_input():
+        raise NotImplementedError("flash_attn not available")
+    
+    def rearrange():
+        raise NotImplementedError("flash_attn not available")
+    
+    def unpad_input():
+        raise NotImplementedError("flash_attn not available")
+    
+    FLASH_ATTN_AVAILABLE = False
+
 from torch import nn, optim
 from torch.distributed.fsdp import FullyShardedDataParallel as FSDP
 
@@ -40,9 +60,10 @@ from verl.utils.ulysses import (gather_outpus_and_unpad,
                                 ulysses_pad_and_slice_inputs)
 from verl.workers.critic import BasePPOCritic
 
-if is_cuda_available:
-    from flash_attn.bert_padding import (index_first_axis, pad_input,
-                                         rearrange, unpad_input)
+# Use our conditional import instead of direct imports
+if is_cuda_available and FLASH_ATTN_AVAILABLE:
+    # flash_attn functions are already imported above
+    pass
 elif is_npu_available:
     from transformers.integrations.npu_flash_attention import (
         index_first_axis, pad_input, rearrange, unpad_input)
