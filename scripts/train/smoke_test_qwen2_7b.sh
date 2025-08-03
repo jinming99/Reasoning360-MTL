@@ -19,9 +19,20 @@ export FLASH_ATTENTION_DISABLED=1
 unset ROCR_VISIBLE_DEVICES 2>/dev/null || true
 unset HIP_VISIBLE_DEVICES 2>/dev/null || true
 
-# Disable WandB completely for smoke test
-export WANDB_MODE=disabled
-export WANDB_DISABLED=true
+# =================== WandB Configuration ===================
+# Set your WandB API key here (get from https://wandb.ai/settings)
+export WANDB_API_KEY=""  # TODO: Add your WandB API key here
+
+# WandB project settings
+export WANDB_PROJECT="Reasoning360-MTL"
+export WANDB_EXPERIMENT_NAME="smoke-test-qwen2-7b-${SLURM_JOB_ID:-local}"
+
+# For smoke test, you can disable WandB by uncommenting the lines below:
+# export WANDB_MODE=disabled
+# export WANDB_DISABLED=true
+
+# Enable WandB logging (comment out to disable)
+export WANDB_MODE=online
 
 # Let SLURM handle GPU allocation - remove restrictive CUDA_VISIBLE_DEVICES setting
 # export CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES:-0}
@@ -231,7 +242,9 @@ $PYTHON_BIN -m verl.trainer.main_ppo \
   trainer.n_gpus_per_node=$NUM_GPUS \
   trainer.val_before_train=false \
   trainer.test_freq=0 \
-  +wandb.mode=disabled \
+  trainer.logger=['console','wandb'] \
+  trainer.project_name=${WANDB_PROJECT} \
+  trainer.experiment_name=${WANDB_EXPERIMENT_NAME} \
   ++trainer.ray_wait_register_center_timeout=300 \
   ++actor_rollout_ref.model.enable_flash_attention=false \
   ++critic.model.enable_flash_attention=false \
