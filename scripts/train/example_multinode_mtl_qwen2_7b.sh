@@ -31,7 +31,7 @@ unset HIP_VISIBLE_DEVICES 2>/dev/null || true
 
 # =================== WandB Configuration ===================
 # Set your WandB API key here (get from https://wandb.ai/settings)
-export WANDB_API_KEY=""  # TODO: Add your WandB API key here
+export WANDB_API_KEY="dd85f472f958957fc212f43f0947e8a086beb38c"  # TODO: Add your WandB API key here
 
 # WandB project settings
 export WANDB_PROJECT="Reasoning360-MTL"
@@ -134,7 +134,7 @@ srun --jobid ${SLURM_JOBID} --kill-on-bad-exit=1 \
     --config-name=ppo_trainer \
     algorithm.adv_estimator=grpo \
     data.train_files="$TRAIN_FILES" \
-    data.val_files="[/home/jinming/Reasoning360-MTL/data/train/guru_18k/math.parquet]" \
+    data.val_files="[/home/jinming/Reasoning360-MTL/data/validation/guru_3k_validation_mix.parquet]" \
     data.train_batch_size=$TRAIN_PROMPT_BSZ \
     data.gen_batch_size=$GEN_PROMPT_BSZ \
     data.max_prompt_length=$MAX_PROMPT_LENGTH \

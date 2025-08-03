@@ -21,7 +21,7 @@ unset HIP_VISIBLE_DEVICES 2>/dev/null || true
 
 # =================== WandB Configuration ===================
 # Set your WandB API key here (get from https://wandb.ai/settings)
-export WANDB_API_KEY=""  # TODO: Add your WandB API key here
+export WANDB_API_KEY="dd85f472f958957fc212f43f0947e8a086beb38c"  # TODO: Add your WandB API key here
 
 # WandB project settings
 export WANDB_PROJECT="Reasoning360-MTL"
@@ -230,7 +230,7 @@ $PYTHON_BIN -m verl.trainer.main_ppo \
   actor_rollout_ref.model.path="$MODEL_DIR" \
   data.tokenizer="$MODEL_DIR" \
   data.train_files="[/home/jinming/Reasoning360-MTL/data/train/guru_18k/math.parquet,/home/jinming/Reasoning360-MTL/data/train/guru_18k/logic.parquet]" \
-  data.val_files="[/home/jinming/Reasoning360-MTL/data/train/guru_18k/math.parquet]" \
+  data.val_files=[/home/jinming/Reasoning360-MTL/data/validation/guru_3k/math.parquet] \
   data.max_prompt_length=128 data.max_response_length=128 \
   data.train_batch_size=4 \
   actor_rollout_ref.actor.ppo_mini_batch_size=4 \
