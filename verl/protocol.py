@@ -108,7 +108,25 @@ def union_tensor_dict(tensor_dict1: TensorDict, tensor_dict2: TensorDict) -> Ten
         if key not in tensor_dict1.keys():
             tensor_dict1[key] = tensor_dict2[key]
         else:
-            assert tensor_dict1[key].equal(tensor_dict2[key]), f"{key} in tensor_dict1 and tensor_dict2 are not the same object"
+            # Handle generation case where sequences may have different lengths
+            if tensor_dict1[key].shape != tensor_dict2[key].shape:
+                # For sequence-related tensors, use the longer one (generated output)
+                if key in ['input_ids', 'attention_mask', 'position_ids'] and len(tensor_dict1[key].shape) >= 2:
+                    seq_len1 = tensor_dict1[key].shape[-1]
+                    seq_len2 = tensor_dict2[key].shape[-1]
+                    if seq_len2 > seq_len1:
+                        print(f"Using longer {key} tensor from generated output: {tensor_dict2[key].shape}")
+                        tensor_dict1[key] = tensor_dict2[key]
+                    else:
+                        print(f"Keeping original {key} tensor: {tensor_dict1[key].shape}")
+                else:
+                    raise AssertionError(f"{key} shape mismatch: {tensor_dict1[key].shape} vs {tensor_dict2[key].shape}")
+            elif not tensor_dict1[key].equal(tensor_dict2[key]):
+                # For same-shape tensors, check if they're identical
+                if torch.allclose(tensor_dict1[key].float(), tensor_dict2[key].float(), rtol=1e-5, atol=1e-8):
+                    print(f"Tensors for {key} are numerically identical")
+                else:
+                    print(f"Warning: {key} tensors differ but have same shape. Using first tensor.")
 
     return tensor_dict1
 

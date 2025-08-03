@@ -20,6 +20,19 @@
 
 set -euo pipefail
 
+# =================== Environment Setup ===================
+# Disable flash attention to avoid import errors
+export FLASH_ATTENTION_DISABLE=1
+export FLASH_ATTENTION_DISABLED=1
+
+# Disable conflicting GPU environment variables
+unset ROCR_VISIBLE_DEVICES 2>/dev/null || true
+unset HIP_VISIBLE_DEVICES 2>/dev/null || true
+
+# Disable WandB for stability (can be re-enabled later)
+export WANDB_MODE=disabled
+export WANDB_DISABLED=true
+
 export NCCL_DEBUG=info
 export NCCL_ALGO=NVLSTree
 export NCCL_IBEXT_DISABLE=1
@@ -56,7 +69,12 @@ CLIP_RATIO=0.2
 MAX_PROMPT_LENGTH=$((1024 * 4))
 MAX_RESPONSE_LENGTH=$((1024 * 8))
 
-# Start Ray cluster
+# =================== Install Dependencies ===================
+# Install required packages in virtual environment
+echo "Installing required dependencies..."
+pip install numba
+
+# =================== Start Ray Cluster ===================
 nodes=( $(scontrol show hostnames "$SLURM_JOB_NODELIST") )
 head_node=${nodes[0]}
 port=6379
@@ -64,17 +82,25 @@ head_node_ip=$(srun --nodes=1 --ntasks=1 -w "$head_node" hostname --ip-address)
 address_head=$head_node_ip:$port
 worker_num=${#nodes[@]}
 
+echo "Starting Ray cluster with ${worker_num} nodes..."
+echo "Head node: $head_node_ip:$port"
+
 srun --nodes=$worker_num --ntasks=$worker_num --ntasks-per-node=1 ray stop
 sleep 10
 srun --nodes=$worker_num --ntasks=$worker_num --ntasks-per-node=1 rm -rf /tmp/ray/ray_current_cluster
 sleep 3
 
-srun --nodes=1 --ntasks=1 -w "$head_node" ${CONDA_BIN_PATH:-python} -m ray start --head --node-ip-address="$head_node_ip" --port=$port --num-cpus "$SLURM_CPUS_PER_TASK" --num-gpus 8 --block &
+# Start Ray head node (disable dashboard to avoid startup failures)
+srun --nodes=1 --ntasks=1 -w "$head_node" ${CONDA_BIN_PATH:-python} -m ray start --head --node-ip-address="$head_node_ip" --port=$port --num-cpus "$SLURM_CPUS_PER_TASK" --num-gpus 8 --include-dashboard=false --block &
 sleep 10
+
+# Start Ray worker nodes
 for node in "${nodes[@]:1}"; do
     srun --nodes=1 --ntasks=1 -w "$node" ${CONDA_BIN_PATH:-python} -m ray start --address "$address_head" --num-cpus "$SLURM_CPUS_PER_TASK" --num-gpus 8 --block &
 done
 sleep 10
+
+echo "Ray cluster started successfully"
 
 # Launch training with the standard PPO trainer (MTL is handled via config)
 # Use ppo_trainer.yaml as base config, consistent with smoke test
@@ -99,7 +125,7 @@ srun --jobid ${SLURM_JOBID} --kill-on-bad-exit=1 \
     trainer.n_gpus_per_node=8 \
     trainer.nnodes=${#nodes[@]} \
     trainer.total_epochs=3 \
-    trainer.val_before_train=True \
-    trainer.logger=['console','wandb'] \
+    trainer.val_before_train=false \
+    trainer.logger=['console'] \
     mtl.enabled=true \
     mtl.method=$MTL_METHOD

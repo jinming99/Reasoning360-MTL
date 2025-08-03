@@ -15,7 +15,20 @@ set -euo pipefail
 export FLASH_ATTENTION_DISABLE=1
 export FLASH_ATTENTION_DISABLED=1
 
-export CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES:-0}
+# Unset conflicting GPU environment variables
+unset ROCR_VISIBLE_DEVICES 2>/dev/null || true
+unset HIP_VISIBLE_DEVICES 2>/dev/null || true
+
+# Disable WandB completely for smoke test
+export WANDB_MODE=disabled
+export WANDB_DISABLED=true
+
+# Let SLURM handle GPU allocation - remove restrictive CUDA_VISIBLE_DEVICES setting
+# export CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES:-0}
+
+# Automatically detect number of available GPUs
+NUM_GPUS=$(nvidia-smi --query-gpu=index --format=csv,noheader,nounits | wc -l)
+echo "Detected $NUM_GPUS GPUs available"
 
 # Absolute paths are safer than $PWD inside YAML interpolations
 PROJECT_ROOT=$(realpath "$(dirname "${BASH_SOURCE[0]}")/..")
@@ -42,10 +55,11 @@ fi
 
 # Check for required Python packages
 REQUIRED_PKGS=("numpy" "torch" "transformers" "ray" "pandas" "numba")
+PIP_BIN="/home/jinming/Reasoning360-MTL/venv_reasoning360mtl/bin/pip"
 for pkg in "${REQUIRED_PKGS[@]}"; do
     if ! $PYTHON_BIN -c "import $pkg" &> /dev/null; then
         echo "Installing missing package: $pkg"
-        pip install $pkg || {
+        $PIP_BIN install $pkg || {
             echo "Error: Failed to install $pkg"
             exit 1
         }
@@ -93,6 +107,7 @@ actor_rollout_ref:
     use_shm: false
     use_fused_kernels: false
   rollout:
+    name: hf
     n: 1
     temperature: 0.7
     top_p: 1.0
@@ -100,14 +115,10 @@ actor_rollout_ref:
     max_tokens: 128
     stop_token_ids: null
     stop: []
-    gpu_memory_utilization: 0.2
-    max_model_len: 384
-    enforce_eager: true
-    max_num_batched_tokens: 512
-    load_format: dummy_dtensor
+    tensor_model_parallel_size: 1
 
 trainer:
-  n_gpus_per_node: 1
+  n_gpus_per_node: $NUM_GPUS
   nnodes: 1
   total_epochs: 1
   total_training_steps: 10
@@ -142,7 +153,7 @@ optimizer:
 ray_init:
   address: auto
   num_cpus: 4
-  num_gpus: 1
+  num_gpus: $NUM_GPUS
 YAML
 
 # Ensure we remove the temporary file even on Ctrl‑C
@@ -162,7 +173,8 @@ if [ -z "${SKIP_RAY_START:-}" ]; then
                  --node-ip-address="$HOST_IP" \
                  --port=6379 \
                  --num-cpus=4 \
-                 --num-gpus=1 &
+                 --num-gpus=$NUM_GPUS \
+                 --include-dashboard=false &
   sleep 5
   export RAY_ADDRESS=${HOST_IP}:6379
   echo "Ray head started at $RAY_ADDRESS"
@@ -210,15 +222,15 @@ $PYTHON_BIN -m verl.trainer.main_ppo \
   data.val_files="[/home/jinming/Reasoning360-MTL/data/train/guru_18k/math.parquet]" \
   data.max_prompt_length=128 data.max_response_length=128 \
   data.train_batch_size=4 \
-  actor_rollout_ref.actor.ppo_mini_batch_size=2 \
-  actor_rollout_ref.actor.ppo_micro_batch_size_per_gpu=2 \
-  critic.ppo_micro_batch_size_per_gpu=2 \
-  actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=2 \
-  actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=2 \
+  actor_rollout_ref.actor.ppo_mini_batch_size=4 \
+  actor_rollout_ref.actor.ppo_micro_batch_size_per_gpu=1 \
+  critic.ppo_micro_batch_size_per_gpu=1 \
+  actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=1 \
+  actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=1 \
   actor_rollout_ref.rollout.n=1 \
-  trainer.n_gpus_per_node=1 \
-  +trainer.ray_worker_group_cls.num_workers=2 \
-  +trainer.ray_worker_group_cls.num_gpus_per_worker=1 \
+  trainer.n_gpus_per_node=$NUM_GPUS \
+  trainer.val_before_train=false \
+  trainer.test_freq=0 \
   +wandb.mode=disabled \
   ++trainer.ray_wait_register_center_timeout=300 \
   ++actor_rollout_ref.model.enable_flash_attention=false \

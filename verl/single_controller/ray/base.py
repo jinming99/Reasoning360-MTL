@@ -121,28 +121,68 @@ class RayResourcePool(ResourcePool):
         self.accelerator_type = accelerator_type
 
     def get_placement_groups(self, strategy="STRICT_PACK", name=None, device_name="cuda"):
+        print(f"DEBUG: get_placement_groups called with strategy={strategy}, device_name={device_name}")
         if self.pgs is not None:
+            print(f"DEBUG: Returning existing placement groups")
             return self.pgs
 
         pg_name_prefix = name if name else f"{self.name_prefix}verl_group_{'_'.join([str(count) for count in self._store])}:"
-        # print(f"pg_name_prefix = {pg_name_prefix}")
+        print(f"DEBUG: pg_name_prefix = {pg_name_prefix}")
         if device_name == "npu":
             device_name = "NPU"
         elif device_name == "cuda":
             device_name = "GPU"
+        print(f"DEBUG: Resolved device_name = {device_name}")
 
-        bundle = {"CPU": self.max_colocate_count}
+        # Calculate available CPUs and adjust CPU allocation to avoid resource shortage
+        available_cpus = ray.available_resources().get('CPU', 0)
+        total_bundles = sum(self._store)
+        
+        # Use fractional CPUs if needed to fit within available resources
+        cpu_per_bundle = min(self.max_colocate_count, max(0.1, available_cpus / total_bundles))
+        
+        bundle = {"CPU": cpu_per_bundle}
         if self.use_gpu:
             bundle[device_name] = 1
             if self.accelerator_type is not None:
                 bundle[self.accelerator_type] = 1e-4
+        print(f"DEBUG: Available CPUs: {available_cpus}, Total bundles: {total_bundles}")
+        print(f"DEBUG: CPU per bundle: {cpu_per_bundle}")
+        print(f"DEBUG: Bundle configuration: {bundle}")
         pg_scheme = [[bundle.copy() for _ in range(process_count)] for process_count in self._store]
+        print(f"DEBUG: pg_scheme: {pg_scheme}")
+        print(f"DEBUG: self._store: {self._store}")
 
         lifetime = "detached" if self.detached else None
+        print(f"DEBUG: lifetime = {lifetime}")
 
+        print(f"DEBUG: About to create placement groups")
         pgs = [placement_group(bundles=bundles, strategy=strategy, name=pg_name_prefix + str(idx), lifetime=lifetime) for idx, bundles in enumerate(pg_scheme)]
+        print(f"DEBUG: Created {len(pgs)} placement groups")
 
-        ray.get([pg.ready() for pg in pgs])
+        print(f"DEBUG: About to wait for placement groups to be ready")
+        print(f"DEBUG: Ray cluster resources: {ray.cluster_resources()}")
+        print(f"DEBUG: Ray available resources: {ray.available_resources()}")
+        
+        # Add timeout to prevent infinite hang
+        import time
+        start_time = time.time()
+        timeout = 60  # 60 seconds timeout
+        
+        try:
+            ray.get([pg.ready() for pg in pgs], timeout=timeout)
+            print(f"DEBUG: All placement groups are ready")
+        except Exception as e:
+            elapsed = time.time() - start_time
+            print(f"DEBUG: Placement group ready failed after {elapsed:.2f}s: {e}")
+            print(f"DEBUG: Placement group states:")
+            for i, pg in enumerate(pgs):
+                try:
+                    state = ray.get(pg.ready(), timeout=1)
+                    print(f"DEBUG: PG {i}: ready = {state}")
+                except Exception as pg_e:
+                    print(f"DEBUG: PG {i}: error = {pg_e}")
+            raise
 
         self.pgs = pgs
         return pgs
@@ -209,7 +249,7 @@ class RayClassWithInitArgs(ClassWithInitArgs):
         """
         self._options.update(options)
 
-    def __call__(self, placement_group, placement_group_bundle_idx, use_gpu: bool = True, num_gpus=1, sharing_with=None, device_name="cuda") -> Any:
+    def __call__(self, placement_group, placement_group_bundle_idx, use_gpu: bool = True, num_gpus=1, num_cpus=None, sharing_with=None, device_name="cuda") -> Any:
         """Create and return a Ray actor with the configured options.
 
         Args:
@@ -236,6 +276,10 @@ class RayClassWithInitArgs(ClassWithInitArgs):
             options["num_gpus"] = num_gpus
         if use_gpu and device_name == "npu":
             options["resources"] = {"NPU": num_gpus}
+            
+        # Set CPU requirement to match placement group bundle
+        if num_cpus is not None:
+            options["num_cpus"] = num_cpus
 
         if len(self._additional_resource) > 1:
             for k, v in self._additional_resource.items():
@@ -280,7 +324,9 @@ class RayWorkerGroup(WorkerGroup):
             ray_wait_register_center_timeout: Timeout for waiting on register center
             **kwargs: Additional keyword arguments
         """
+        print(f"DEBUG: RayWorkerGroup.__init__ starting")
         super().__init__(resource_pool=resource_pool, **kwargs)
+        print(f"DEBUG: RayWorkerGroup super().__init__ completed")
         self.ray_cls_with_init = ray_cls_with_init
         self.name_prefix = get_random_string(length=6) if name_prefix is None else name_prefix
         self._ray_wait_register_center_timeout = ray_wait_register_center_timeout
@@ -289,21 +335,29 @@ class RayWorkerGroup(WorkerGroup):
         # if a WorkerGroup is spawned from Colocate WorkerGroup, this indicates which sub-class is binded to this WorkerGroup.
         self.sub_cls_name = ""
         self.device_name = device_name
+        print(f"DEBUG: RayWorkerGroup basic setup completed")
 
         if worker_names is not None and (not self.fused_worker_used):
             assert self._is_init_with_detached_workers
             self._worker_names = worker_names
 
+        print(f"DEBUG: About to initialize workers - detached: {self._is_init_with_detached_workers}")
         if self._is_init_with_detached_workers:
+            print(f"DEBUG: Initializing with detached workers")
             self._init_with_detached_workers(worker_names=worker_names, worker_handles=worker_handles)
         else:
+            print(f"DEBUG: Initializing with resource pool")
             self._init_with_resource_pool(resource_pool=resource_pool, ray_cls_with_init=ray_cls_with_init, bin_pack=bin_pack, detached=detached)
+        print(f"DEBUG: Worker initialization completed")
 
         if ray_cls_with_init is not None:
+            print(f"DEBUG: Binding worker methods")
             self._bind_worker_method(self.ray_cls_with_init.cls, func_generator)
+            print(f"DEBUG: Worker method binding completed")
 
         self.wg_dict = None
         self.method_names = []
+        print(f"DEBUG: RayWorkerGroup.__init__ completed successfully")
 
     def _is_worker_alive(self, worker: ray.actor.ActorHandle):
         """Check if a worker actor is still alive.
@@ -335,22 +389,32 @@ class RayWorkerGroup(WorkerGroup):
             bin_pack: Whether to use strict bin packing for resource allocation
             detached: Whether workers should be detached
         """
+        print(f"DEBUG: _init_with_resource_pool starting")
         use_gpu = resource_pool.use_gpu
+        print(f"DEBUG: use_gpu = {use_gpu}")
 
         strategy = "PACK"
         if bin_pack:
             strategy = "STRICT_PACK"
+        print(f"DEBUG: Getting placement groups with strategy {strategy}")
         pgs = resource_pool.get_placement_groups(strategy=strategy, device_name=self.device_name)
+        print(f"DEBUG: Got {len(pgs)} placement groups")
         world_size = resource_pool.world_size
         self._world_size = world_size
+        print(f"DEBUG: world_size = {world_size}")
         # cia.add_kwarg("_world_size", world_size)
         num_gpus = 1 / resource_pool.max_colocate_count
+        print(f"DEBUG: num_gpus = {num_gpus}")
 
         rank = -1
         local_world_size = resource_pool.store[0]
+        print(f"DEBUG: local_world_size = {local_world_size}")
+        print(f"DEBUG: About to iterate over placement groups")
         for pg_idx, pg in enumerate(sort_placement_group_by_node_ip(pgs)):
+            print(f"DEBUG: Processing placement group {pg_idx}")
             assert local_world_size <= pg.bundle_count, f"when generating for {self.name_prefix}, for the "
             for local_rank in range(local_world_size):
+                print(f"DEBUG: Processing local_rank {local_rank}")
                 rank += 1
 
                 # we pass in environment variable at option so that Worker can use environment variable to set
@@ -378,8 +442,12 @@ class RayWorkerGroup(WorkerGroup):
                 if detached:
                     ray_cls_with_init.update_options({"lifetime": "detached"})
 
+                # Get CPU requirement from placement group bundle
+                bundle_specs = ray._private.state.state.placement_group_table(pg.id)["bundles"]
+                num_cpus = bundle_specs[local_rank].get("CPU", 1.0)
+                
                 # create a worker
-                worker = ray_cls_with_init(placement_group=pg, placement_group_bundle_idx=local_rank, use_gpu=use_gpu, num_gpus=num_gpus, device_name=self.device_name)
+                worker = ray_cls_with_init(placement_group=pg, placement_group_bundle_idx=local_rank, use_gpu=use_gpu, num_gpus=num_gpus, num_cpus=num_cpus, device_name=self.device_name)
                 self._workers.append(worker)
                 self._worker_names.append(name)
 
@@ -719,6 +787,7 @@ def create_colocated_worker_cls(class_dict: dict[str, RayClassWithInitArgs]):
     worker_cls = _determine_fsdp_megatron_base_class([cls.cls.__ray_actor_class__.__mro__ for cls in class_dict.values()])
     assert issubclass(worker_cls, Worker), f"worker_cls {worker_cls} should be a subclass of Worker"
     print(f"colocated worker base class {worker_cls}")
+    print(f"DEBUG: About to create WorkerDict class with cls_dict keys: {list(class_dict.keys())}")
 
     for key, cls in class_dict.items():
         cls_dict[key] = cls.cls
@@ -729,23 +798,36 @@ def create_colocated_worker_cls(class_dict: dict[str, RayClassWithInitArgs]):
     # TODO: create a class with customizable name
     class WorkerDict(worker_cls):
         def __init__(self):
+            import os  # Import os for local scope
+            from unittest.mock import patch  # Import patch for local scope
+            print(f"DEBUG: WorkerDict.__init__ starting")
             super().__init__()
+            print(f"DEBUG: WorkerDict super().__init__() completed")
             self.worker_dict = {}
             for key, user_defined_cls in cls_dict.items():
+                print(f"DEBUG: Processing worker class {key}: {user_defined_cls}")
                 user_defined_cls = _unwrap_ray_remote(user_defined_cls)
                 # directly instantiate the class without remote
                 # in worker class, e.g. <verl.single_controller.base.worker.Worker>
                 # when DISABLE_WORKER_INIT == 1 it will return immediately
                 with patch.dict(os.environ, {"DISABLE_WORKER_INIT": "1"}):
+                    print(f"DEBUG: About to instantiate {key} worker")
                     self.worker_dict[key] = user_defined_cls(*init_args_dict[key].get("args", ()), **init_args_dict[key].get("kwargs", {}))
+                    print(f"DEBUG: Successfully instantiated {key} worker")
 
     # now monkey-patch the methods from inner class to WorkerDict
+    print(f"DEBUG: About to bind worker methods")
     for key, user_defined_cls in cls_dict.items():
+        print(f"DEBUG: Binding methods for {key}")
         user_defined_cls = _unwrap_ray_remote(user_defined_cls)
         _bind_workers_method_to_parent(WorkerDict, key, user_defined_cls)
+        print(f"DEBUG: Successfully bound methods for {key}")
 
+    print(f"DEBUG: About to create Ray remote class from WorkerDict")
     remote_cls = ray.remote(WorkerDict)
+    print(f"DEBUG: Successfully created Ray remote class")
     remote_cls = RayClassWithInitArgs(cls=remote_cls)
+    print(f"DEBUG: Successfully wrapped in RayClassWithInitArgs")
     return remote_cls
 
 
@@ -780,6 +862,8 @@ def create_colocated_worker_raw_cls(class_dict: dict[str, RayClassWithInitArgs])
 
     class FusedWorker(Worker):
         def __init__(self, *args, **kwargs):
+            import os  # Import os for local scope
+            from unittest.mock import patch  # Import patch for local scope
             super().__init__(*args, **kwargs)
             self.cls_names = cls_names
             self.raw_cls_dict = raw_cls_dict

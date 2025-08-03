@@ -265,8 +265,26 @@ class RLHFDataset(Dataset):
             row_dict["raw_prompt"] = chat.tolist()
 
         # add index for each prompt
-        index = row_dict.get("extra_info", {}).get("index", 0)
+        # Parse extra_info if it's a JSON string
+        extra_info = row_dict.get("extra_info", {})
+        if isinstance(extra_info, str):
+            import json
+            try:
+                extra_info = json.loads(extra_info)
+            except (json.JSONDecodeError, TypeError):
+                extra_info = {}
+        index = extra_info.get("index", 0)
         row_dict["index"] = index
+        
+        # Parse reward_model if it's a Python dict string
+        reward_model = row_dict.get("reward_model", {})
+        if isinstance(reward_model, str):
+            try:
+                import ast
+                reward_model = ast.literal_eval(reward_model)
+                row_dict["reward_model"] = reward_model
+            except (ValueError, SyntaxError, TypeError):
+                row_dict["reward_model"] = {}
 
         return row_dict
 

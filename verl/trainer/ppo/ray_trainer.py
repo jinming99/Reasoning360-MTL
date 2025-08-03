@@ -708,9 +708,15 @@ class RayPPOTrainer:
             wg_kwargs["ray_wait_register_center_timeout"] = self.config.trainer.ray_wait_register_center_timeout
 
         for resource_pool, class_dict in self.resource_pool_to_cls.items():
+            print(f"DEBUG: Creating colocated worker class for resource pool {resource_pool} with classes {list(class_dict.keys())}")
             worker_dict_cls = create_colocated_worker_cls(class_dict=class_dict)
+            print(f"DEBUG: Successfully created colocated worker class")
+            print(f"DEBUG: Creating RayWorkerGroup with resource pool {resource_pool}")
             wg_dict = self.ray_worker_group_cls(resource_pool=resource_pool, ray_cls_with_init=worker_dict_cls, device_name=self.device_name, **wg_kwargs)
+            print(f"DEBUG: Successfully created RayWorkerGroup")
+            print(f"DEBUG: Spawning worker groups with prefix_set {list(class_dict.keys())}")
             spawn_wg = wg_dict.spawn(prefix_set=class_dict.keys())
+            print(f"DEBUG: Successfully spawned worker groups: {list(spawn_wg.keys())}")
             all_wg.update(spawn_wg)
 
         if self.use_critic:

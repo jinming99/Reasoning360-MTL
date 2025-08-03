@@ -135,22 +135,50 @@ class Worker(WorkerHelper):
         """The keys of the environment variables that are used to configure the Worker."""
         return ["WORLD_SIZE", "RANK", "LOCAL_WORLD_SIZE", "LOCAL_RANK", "MASTER_ADDR", "MASTER_PORT", "CUDA_VISIBLE_DEVICES"]
 
-    def __init__(self, cuda_visible_devices=None) -> None:
+    def __init__(self, cuda_visible_devices=None):
         """Initialize the worker with environment settings and device configuration.
 
         Args:
             cuda_visible_devices (str, optional):
                 CUDA visible devices configuration. Defaults to None.
         """
-        # construct a meta from environment variable. Note that the import must be inside the class because it is executed remotely
-        import os
+        print(f"DEBUG: Worker.__init__ starting")
+        # note that here we use int to distinguish
+        disable_worker_init = int(os.environ.get("DISABLE_WORKER_INIT", 0))
+        print(f"DEBUG: DISABLE_WORKER_INIT = {disable_worker_init}")
+        
+        # Initialize essential attributes even when worker init is disabled
+        self._rank = int(os.environ.get("RANK", 0))
+        self._world_size = int(os.environ.get("WORLD_SIZE", 1))
+        self._local_rank = int(os.environ.get("LOCAL_RANK", 0))
+        self._local_world_size = int(os.environ.get("LOCAL_WORLD_SIZE", 1))
+        self._master_addr = os.environ.get("MASTER_ADDR", None)
+        self._master_port = os.environ.get("MASTER_PORT", None)
+        
+        if disable_worker_init:
+            print(f"DEBUG: Worker init disabled, returning early with essential attributes set")
+            return
 
+        print(f"DEBUG: Setting up CUDA visible devices")
         self._setup_env_cuda_visible_devices()
+        print(f"DEBUG: CUDA setup completed")
 
-        world_size = int(os.environ["WORLD_SIZE"])
-        rank = int(os.environ["RANK"])
-        self._rank = rank
-        self._world_size = world_size
+        # get the rank information
+        print(f"DEBUG: Getting rank information from environment")
+        self._rank = int(os.environ.get("RANK", 0))
+        self._world_size = int(os.environ.get("WORLD_SIZE", 1))
+        self._local_rank = int(os.environ.get("LOCAL_RANK", 0))
+        self._local_world_size = int(os.environ.get("LOCAL_WORLD_SIZE", 1))
+        self._master_addr = os.environ.get("MASTER_ADDR", None)
+        self._master_port = os.environ.get("MASTER_PORT", None)
+        print(f"DEBUG: Rank info - rank={self._rank}, world_size={self._world_size}, master_addr={self._master_addr}")
+
+        # get the pid
+        print(f"DEBUG: Getting PID")
+        self._pid = self._get_pid()
+        print(f"DEBUG: Worker.__init__ completed successfully")
+
+        # construct a meta from environment variable. Note that os is already imported at module level
 
         master_addr = os.environ["MASTER_ADDR"]
         master_port = os.environ["MASTER_PORT"]
@@ -159,8 +187,8 @@ class Worker(WorkerHelper):
         local_rank = int(os.getenv("LOCAL_RANK", "0"))
 
         store = {
-            "_world_size": world_size,
-            "_rank": rank,
+            "_world_size": self._world_size,
+            "_rank": self._rank,
             "_local_world_size": local_world_size,
             "_local_rank": local_rank,
             "_master_addr": master_addr,

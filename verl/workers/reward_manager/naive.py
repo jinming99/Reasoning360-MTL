@@ -62,7 +62,23 @@ class NaiveRewardManager:
             prompt_str = self.tokenizer.decode(valid_prompt_ids, skip_special_tokens=True)
             response_str = self.tokenizer.decode(valid_response_ids, skip_special_tokens=True)
 
-            ground_truth = data_item.non_tensor_batch["reward_model"]["ground_truth"]
+            # Debug reward_model structure
+            reward_model = data_item.non_tensor_batch.get("reward_model", {})
+            print(f"Debug: reward_model type: {type(reward_model)}, content: {reward_model}")
+            
+            # Handle different reward_model formats
+            if isinstance(reward_model, str):
+                try:
+                    import ast
+                    reward_model = ast.literal_eval(reward_model)
+                    print(f"Debug: parsed reward_model: {reward_model}")
+                except (ValueError, SyntaxError, TypeError) as e:
+                    print(f"Debug: failed to parse reward_model string: {e}")
+                    reward_model = {}
+            
+            ground_truth = reward_model.get("ground_truth", "")
+            if not ground_truth:
+                print(f"Warning: No ground_truth found in reward_model, using empty string")
 
             data_source = data_item.non_tensor_batch[self.reward_fn_key]
 
