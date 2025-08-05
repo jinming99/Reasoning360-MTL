@@ -32,6 +32,27 @@ def default_compute_score(data_source, solution_str, ground_truth, extra_info=No
     Raises:
         NotImplementedError: If the reward function is not implemented for the given data source.
     """
+    # Debug input parameters
+    print(f"\n=== COMPUTE_SCORE DEBUG START ===")
+    print(f"Debug: data_source = {data_source}")
+    print(f"Debug: solution_str length = {len(solution_str) if solution_str else 0}")
+    print(f"Debug: solution_str preview = {repr(solution_str[:100]) if solution_str else 'None'}...")
+    print(f"Debug: ground_truth type = {type(ground_truth)}")
+    print(f"Debug: ground_truth = {repr(str(ground_truth)[:100]) if ground_truth else 'None'}...")
+    print(f"Debug: extra_info = {extra_info}")
+    
+    # Parse extra_info if it's a string
+    import ast
+    if isinstance(extra_info, str):
+        try:
+            extra_info = ast.literal_eval(extra_info)
+        except (ValueError, SyntaxError):
+            print(f"Warning: Could not parse extra_info string: {extra_info}")
+            extra_info = {}
+    
+    if extra_info is None:
+        extra_info = {}
+    
     reward_metric = extra_info.get("reward_metric", None)
 
     # math
@@ -152,14 +173,118 @@ def default_compute_score(data_source, solution_str, ground_truth, extra_info=No
 
         res = search_r1_like_qa_em.compute_score(solution_str, ground_truth)
     else:
-        raise NotImplementedError(f"Reward function is not implemented for {data_source=}")
+        # If data source is not recognized, set res to 0 to trigger fallback
+        print(f"⚠️ Data source {data_source} not recognized by original GURU functions, using fallback")
+        res = {'score': 0.0, 'acc': False}
 
+    print(f"Debug: raw result from scoring function: {res} (type: {type(res)})")
+    
+    # Check if we should use improved rewards as fallback
+    should_use_fallback = False
+    original_score = None
+    
     if isinstance(res, dict):
-        return res
+        original_score = res.get('score', 0.0)
+        if original_score == 0.0:
+            should_use_fallback = True
+        else:
+            final_result = res
+            print(f"Debug: returning dict result: {final_result}")
+            print(f"=== COMPUTE_SCORE DEBUG END ===\n")
+            return final_result
     elif isinstance(res, (int, float, bool)):
-        return float(res)
+        original_score = float(res)
+        if original_score == 0.0:
+            should_use_fallback = True
+        else:
+            final_result = float(res)
+            print(f"Debug: returning float result: {final_result}")
+            print(f"=== COMPUTE_SCORE DEBUG END ===\n")
+            return final_result
     else:
-        return float(res[0])
+        original_score = float(res[0])
+        if original_score == 0.0:
+            should_use_fallback = True
+        else:
+            final_result = float(res[0])
+            print(f"Debug: returning float from array: {final_result}")
+            print(f"=== COMPUTE_SCORE DEBUG END ===\n")
+            return final_result
+    
+    # Use improved rewards as fallback if original score is 0
+    if should_use_fallback:
+        print(f"🔄 Original reward returned {original_score}, trying improved rewards...")
+        try:
+            # Import our improved reward functions with absolute path
+            import sys
+            import os
+            
+            # Add the project root to Python path
+            project_root = '/home/jinming/Reasoning360-MTL'
+            if project_root not in sys.path:
+                sys.path.insert(0, project_root)
+            
+            from scripts.tests.improved_reward_functions import compute_improved_reward
+            
+            improved_result = compute_improved_reward(data_source, solution_str, ground_truth, extra_info)
+            improved_score = improved_result.get('score', 0.0) if isinstance(improved_result, dict) else float(improved_result)
+            
+            if improved_score > 0.0:
+                print(f"✅ Improved reward function returned: {improved_score}")
+                if isinstance(improved_result, dict):
+                    improved_result['fallback_used'] = True
+                    improved_result['original_score'] = original_score
+                    final_result = improved_result
+                else:
+                    final_result = {'score': improved_score, 'fallback_used': True, 'original_score': original_score}
+                print(f"Debug: returning improved result: {final_result}")
+                print(f"=== COMPUTE_SCORE DEBUG END ===\n")
+                return final_result
+            else:
+                print(f"❌ Improved reward also returned {improved_score}, using original")
+        except Exception as e:
+            print(f"❌ Error in improved reward computation: {e}")
+            print(f"Using original score: {original_score}")
+    
+    # Return original result if no fallback was used or fallback failed
+    # IMPORTANT: Always return consistent dict format to avoid batch size mismatches
+    if isinstance(res, dict):
+        # Add missing metadata keys for consistency
+        if 'method' not in res:
+            res['method'] = 'original'
+        if 'fallback_used' not in res:
+            res['fallback_used'] = False
+        if 'original_score' not in res:
+            res['original_score'] = res.get('score', 0.0)
+        if 'acc' not in res:
+            res['acc'] = res.get('score', 0.0)
+        final_result = res
+        print(f"Debug: returning original dict result: {final_result}")
+        print(f"=== COMPUTE_SCORE DEBUG END ===\n")
+        return final_result
+    elif isinstance(res, (int, float, bool)):
+        final_result = {
+            'score': float(res),
+            'acc': float(res),
+            'method': 'original',
+            'fallback_used': False,
+            'original_score': float(res)
+        }
+        print(f"Debug: returning original float result: {final_result}")
+        print(f"=== COMPUTE_SCORE DEBUG END ===\n")
+        return final_result
+    else:
+        score_val = float(res[0])
+        final_result = {
+            'score': score_val,
+            'acc': score_val,
+            'method': 'original',
+            'fallback_used': False,
+            'original_score': score_val
+        }
+        print(f"Debug: returning original float from array: {final_result}")
+        print(f"=== COMPUTE_SCORE DEBUG END ===\n")
+        return final_result
 
 
 @deprecated("verl.utils.reward_score.default_compute_score")

@@ -1,0 +1,82 @@
+/home/jinming/Reasoning360-MTL/verl/__init__.py:18: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+2025-08-05 12:03:26,530	INFO worker.py:1747 -- Connecting to existing Ray cluster at address: 10.128.9.117:6379...
+2025-08-05 12:03:26,542	INFO worker.py:1918 -- Connected to Ray cluster. View the dashboard at [1m[32m10.128.9.117:8265 [39m[22m
+[36m(pid=2964926)[0m /home/jinming/Reasoning360-MTL/verl/__init__.py:18: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+[36m(pid=2964926)[0m   import pkg_resources
+[36m(TaskRunner pid=2964926)[0m DeprecationWarning: `ray.state.available_resources_per_node` is a private attribute and access will be removed in a future Ray version.
+[36m(TaskRunner pid=2964926)[0m WARNING:2025-08-05 12:03:47,646:Waiting for register center actor 4PIOra_register_center to be ready. Elapsed time: 0 seconds out of 300 seconds.
+[36m(pid=2966558)[0m /home/jinming/Reasoning360-MTL/verl/__init__.py:18: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+[36m(pid=2966558)[0m   import pkg_resources
+[36m(pid=2966955)[0m /home/jinming/Reasoning360-MTL/verl/__init__.py:18: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+[36m(pid=2966955)[0m   import pkg_resources
+[36m(pid=2966956)[0m /home/jinming/Reasoning360-MTL/verl/__init__.py:18: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+[36m(pid=2966956)[0m   import pkg_resources
+[36m(pid=2966957)[0m /home/jinming/Reasoning360-MTL/verl/__init__.py:18: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+[36m(pid=2966957)[0m   import pkg_resources
+[36m(pid=2966958)[0m /home/jinming/Reasoning360-MTL/verl/__init__.py:18: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+[36m(pid=2966958)[0m   import pkg_resources
+[36m(pid=2966959)[0m /home/jinming/Reasoning360-MTL/verl/__init__.py:18: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+[36m(pid=2966959)[0m   import pkg_resources
+[36m(pid=2966960)[0m /home/jinming/Reasoning360-MTL/verl/__init__.py:18: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+[36m(pid=2966960)[0m   import pkg_resources
+[36m(pid=2966962)[0m /home/jinming/Reasoning360-MTL/verl/__init__.py:18: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+[36m(pid=2966962)[0m   import pkg_resources
+[36m(WorkerDict pid=2966558)[0m Sliding Window Attention is enabled but not implemented for `eager`; unexpected results may be encountered.
+[36m(WorkerDict pid=2966955)[0m Sliding Window Attention is enabled but not implemented for `eager`; unexpected results may be encountered.
+[36m(WorkerDict pid=2966956)[0m Sliding Window Attention is enabled but not implemented for `eager`; unexpected results may be encountered.
+[36m(WorkerDict pid=2966957)[0m Sliding Window Attention is enabled but not implemented for `eager`; unexpected results may be encountered.
+[36m(WorkerDict pid=2966958)[0m Sliding Window Attention is enabled but not implemented for `eager`; unexpected results may be encountered.
+[36m(WorkerDict pid=2966959)[0m Sliding Window Attention is enabled but not implemented for `eager`; unexpected results may be encountered.
+[36m(WorkerDict pid=2966960)[0m Sliding Window Attention is enabled but not implemented for `eager`; unexpected results may be encountered.
+[36m(WorkerDict pid=2966962)[0m Sliding Window Attention is enabled but not implemented for `eager`; unexpected results may be encountered.
+[36m(WorkerDict pid=2966558)[0m Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]
+[36m(WorkerDict pid=2966955)[0m Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]
+[36m(WorkerDict pid=2966956)[0m Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]
+[36m(WorkerDict pid=2966957)[0m Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]
+[36m(WorkerDict pid=2966958)[0m Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]
+[36m(WorkerDict pid=2966959)[0m Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]
+[36m(WorkerDict pid=2966960)[0m Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]
+[36m(WorkerDict pid=2966962)[0m Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]
+[36m(WorkerDict pid=2966955)[0m Loading checkpoint shards:  25%|██▌       | 1/4 [00:01<00:05,  1.80s/it]
+[36m(WorkerDict pid=2966956)[0m Loading checkpoint shards:  25%|██▌       | 1/4 [00:02<00:06,  2.19s/it]
+[36m(WorkerDict pid=2966959)[0m Loading checkpoint shards:  25%|██▌       | 1/4 [00:02<00:06,  2.19s/it]
+[36m(WorkerDict pid=2966558)[0m Loading checkpoint shards:  25%|██▌       | 1/4 [00:02<00:07,  2.50s/it]
+[36m(WorkerDict pid=2966957)[0m Loading checkpoint shards:  25%|██▌       | 1/4 [00:02<00:07,  2.48s/it]
+[36m(WorkerDict pid=2966958)[0m Loading checkpoint shards:  25%|██▌       | 1/4 [00:02<00:08,  2.70s/it]
+[36m(WorkerDict pid=2966955)[0m Loading checkpoint shards:  50%|█████     | 2/4 [00:03<00:03,  1.77s/it]
+[36m(WorkerDict pid=2966960)[0m Loading checkpoint shards:  25%|██▌       | 1/4 [00:03<00:10,  3.51s/it]
+[36m(WorkerDict pid=2966962)[0m Loading checkpoint shards:  25%|██▌       | 1/4 [00:03<00:10,  3.50s/it]
+[36m(WorkerDict pid=2966956)[0m Loading checkpoint shards:  50%|█████     | 2/4 [00:04<00:04,  2.19s/it]
+[36m(WorkerDict pid=2966959)[0m Loading checkpoint shards:  50%|█████     | 2/4 [00:04<00:04,  2.19s/it]
+[36m(WorkerDict pid=2966558)[0m Loading checkpoint shards:  50%|█████     | 2/4 [00:04<00:04,  2.44s/it]
+[36m(WorkerDict pid=2966957)[0m Loading checkpoint shards:  50%|█████     | 2/4 [00:04<00:04,  2.44s/it]
+[36m(WorkerDict pid=2966955)[0m Loading checkpoint shards:  75%|███████▌  | 3/4 [00:05<00:01,  1.76s/it]
+[36m(WorkerDict pid=2966958)[0m Loading checkpoint shards:  50%|█████     | 2/4 [00:05<00:05,  2.72s/it]
+[36m(WorkerDict pid=2966956)[0m Loading checkpoint shards:  75%|███████▌  | 3/4 [00:06<00:02,  2.20s/it]
+[36m(WorkerDict pid=2966959)[0m Loading checkpoint shards:  75%|███████▌  | 3/4 [00:06<00:02,  2.20s/it]
+[36m(WorkerDict pid=2966955)[0m Loading checkpoint shards: 100%|██████████| 4/4 [00:06<00:00,  1.69s/it]Loading checkpoint shards: 100%|██████████| 4/4 [00:06<00:00,  1.72s/it]
+[36m(WorkerDict pid=2966960)[0m Loading checkpoint shards:  50%|█████     | 2/4 [00:06<00:06,  3.45s/it]
+[36m(WorkerDict pid=2966962)[0m Loading checkpoint shards:  50%|█████     | 2/4 [00:06<00:06,  3.47s/it]
+[36m(WorkerDict pid=2966558)[0m Loading checkpoint shards:  75%|███████▌  | 3/4 [00:07<00:02,  2.43s/it]
+[36m(WorkerDict pid=2966957)[0m Loading checkpoint shards:  75%|███████▌  | 3/4 [00:07<00:02,  2.43s/it]
+[36m(WorkerDict pid=2966958)[0m Loading checkpoint shards:  75%|███████▌  | 3/4 [00:08<00:02,  2.70s/it]
+[36m(WorkerDict pid=2966956)[0m Loading checkpoint shards: 100%|██████████| 4/4 [00:08<00:00,  2.03s/it]Loading checkpoint shards: 100%|██████████| 4/4 [00:08<00:00,  2.09s/it]
+[36m(WorkerDict pid=2966959)[0m Loading checkpoint shards: 100%|██████████| 4/4 [00:08<00:00,  2.03s/it]Loading checkpoint shards: 100%|██████████| 4/4 [00:08<00:00,  2.09s/it]
+[36m(WorkerDict pid=2966558)[0m Loading checkpoint shards: 100%|██████████| 4/4 [00:09<00:00,  2.31s/it]Loading checkpoint shards: 100%|██████████| 4/4 [00:09<00:00,  2.36s/it]
+[36m(WorkerDict pid=2966957)[0m Loading checkpoint shards: 100%|██████████| 4/4 [00:09<00:00,  2.32s/it]Loading checkpoint shards: 100%|██████████| 4/4 [00:09<00:00,  2.37s/it]
+[36m(WorkerDict pid=2966960)[0m Loading checkpoint shards:  75%|███████▌  | 3/4 [00:09<00:03,  3.16s/it]
+[36m(WorkerDict pid=2966962)[0m Loading checkpoint shards:  75%|███████▌  | 3/4 [00:09<00:03,  3.17s/it]
+[36m(WorkerDict pid=2966958)[0m Loading checkpoint shards: 100%|██████████| 4/4 [00:10<00:00,  2.41s/it]Loading checkpoint shards: 100%|██████████| 4/4 [00:10<00:00,  2.52s/it]
+[36m(WorkerDict pid=2966960)[0m Loading checkpoint shards: 100%|██████████| 4/4 [00:11<00:00,  2.41s/it]Loading checkpoint shards: 100%|██████████| 4/4 [00:11<00:00,  2.75s/it]
+[36m(WorkerDict pid=2966962)[0m Loading checkpoint shards: 100%|██████████| 4/4 [00:11<00:00,  2.42s/it]Loading checkpoint shards: 100%|██████████| 4/4 [00:11<00:00,  2.76s/it]
+[36m(TaskRunner pid=2964926)[0m Training Progress:   0%|          | 0/375 [00:00<?, ?it/s]
+[36m(WorkerDict pid=2966558)[0m Setting `pad_token_id` to `eos_token_id`:151643 for open-end generation.
+[36m(WorkerDict pid=2966955)[0m Setting `pad_token_id` to `eos_token_id`:151643 for open-end generation.
+[36m(WorkerDict pid=2966956)[0m Setting `pad_token_id` to `eos_token_id`:151643 for open-end generation.
+[36m(WorkerDict pid=2966957)[0m Setting `pad_token_id` to `eos_token_id`:151643 for open-end generation.
+[36m(WorkerDict pid=2966958)[0m Setting `pad_token_id` to `eos_token_id`:151643 for open-end generation.
+[36m(WorkerDict pid=2966959)[0m Setting `pad_token_id` to `eos_token_id`:151643 for open-end generation.
+[36m(WorkerDict pid=2966960)[0m Setting `pad_token_id` to `eos_token_id`:151643 for open-end generation.
+[36m(WorkerDict pid=2966962)[0m Setting `pad_token_id` to `eos_token_id`:151643 for open-end generation.
+[36m(TaskRunner pid=2964926)[0m Training Progress:   0%|          | 1/375 [01:02<6:28:50, 62.38s/it]Training Progress:   0%|          | 1/375 [01:02<6:28:50, 62.38s/it]

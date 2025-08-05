@@ -1,0 +1,30 @@
+/home/jinming/Reasoning360-MTL/verl/__init__.py:18: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+2025-08-05 08:20:59,518	INFO worker.py:1747 -- Connecting to existing Ray cluster at address: 10.128.9.112:6379...
+2025-08-05 08:20:59,530	INFO worker.py:1927 -- Connected to Ray cluster.
+[36m(pid=1554034)[0m /home/jinming/Reasoning360-MTL/verl/__init__.py:18: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+[36m(pid=1554034)[0m   import pkg_resources
+Error executing job with overrides: ['algorithm.adv_estimator=grpo', 'data.train_files=[/home/jinming/Reasoning360-MTL/data/train/guru_18k/math.parquet]', 'data.val_files=[/home/jinming/Reasoning360-MTL/data/validation/guru_3k/math.parquet]', 'data.tokenizer=/home/jinming/llm_models/Qwen2.5-7B', 'data.max_prompt_length=512', 'data.max_response_length=1024', 'data.train_batch_size=1', 'data.gen_batch_size=1', 'actor_rollout_ref.model.path=/home/jinming/llm_models/Qwen2.5-7B', 'critic.model.path=/home/jinming/llm_models/Qwen2.5-7B', 'actor_rollout_ref.actor.ppo_mini_batch_size=1', 'actor_rollout_ref.actor.ppo_micro_batch_size_per_gpu=1', 'critic.ppo_micro_batch_size_per_gpu=1', 'actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=1', 'actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=1', 'actor_rollout_ref.rollout.n=1', 'actor_rollout_ref.rollout.name=vllm', 'actor_rollout_ref.rollout.gpu_memory_utilization=0.2', '++actor_rollout_ref.rollout.max_model_len=1536', 'actor_rollout_ref.rollout.temperature=1.0', 'actor_rollout_ref.rollout.top_p=1.0', 'actor_rollout_ref.rollout.top_k=-1', 'actor_rollout_ref.rollout.val_kwargs.top_k=-1', 'actor_rollout_ref.rollout.val_kwargs.top_p=1.0', 'actor_rollout_ref.rollout.val_kwargs.temperature=1.0', 'actor_rollout_ref.rollout.val_kwargs.n=1', 'actor_rollout_ref.rollout.val_kwargs.do_sample=True', 'actor_rollout_ref.model.use_remove_padding=False', 'actor_rollout_ref.model.enable_gradient_checkpointing=True', 'actor_rollout_ref.actor.strategy=fsdp', 'actor_rollout_ref.actor.optim.lr=1e-6', 'actor_rollout_ref.actor.optim.lr_warmup_steps=10', 'actor_rollout_ref.actor.optim.weight_decay=0.1', 'actor_rollout_ref.actor.optim.warmup_style=constant', 'actor_rollout_ref.actor.optim.min_lr_ratio=0.0', 'actor_rollout_ref.actor.clip_ratio_low=0.2', 'actor_rollout_ref.actor.clip_ratio_high=0.2', 'actor_rollout_ref.actor.clip_ratio_c=10.0', 'actor_rollout_ref.actor.entropy_coeff=0', 'actor_rollout_ref.actor.grad_clip=1.0', 'actor_rollout_ref.actor.fsdp_config.param_offload=true', 'actor_rollout_ref.actor.fsdp_config.optimizer_offload=true', '++actor_rollout_ref.actor.fsdp_config.activation_offload=true', '++critic.fsdp_config.param_offload=true', '++critic.fsdp_config.optimizer_offload=true', 'trainer.nnodes=1', 'trainer.n_gpus_per_node=2', 'trainer.total_epochs=30', 'trainer.val_before_train=false', 'trainer.test_freq=3', 'trainer.save_freq=5', 'trainer.logger=[console,wandb]', 'trainer.project_name=Reasoning360-MTL', 'trainer.experiment_name=2gpu-baseline-3274501', '++trainer.ray_wait_register_center_timeout=300', '++actor_rollout_ref.model.enable_flash_attention=false', '++critic.model.enable_flash_attention=false', '++actor_rollout_ref.model.enable_gradient_checkpointing=true', '++critic.model.enable_gradient_checkpointing=true', '++actor_rollout_ref.rollout.multi_turn.enable=false', '++actor_rollout_ref.rollout.mode=sync', '+trainer.early_stopping_min_epochs=10', '+trainer.early_stopping_patience=3', '+trainer.early_stopping_min_delta=0.001', '+trainer.early_stopping_metric=validation_reward_mean', '+trainer.early_stopping_mode=max', 'mtl.enabled=false', 'mtl.method=pcgrad']
+Traceback (most recent call last):
+  File "/home/jinming/Reasoning360-MTL/verl/trainer/main_ppo.py", line 27, in main
+    run_ppo(config)
+  File "/home/jinming/Reasoning360-MTL/verl/trainer/main_ppo.py", line 39, in run_ppo
+    ray.get(runner.run.remote(config))
+  File "/home/jinming/venv_reasoning360mtl/lib64/python3.9/site-packages/ray/_private/auto_init_hook.py", line 22, in auto_init_wrapper
+    return fn(*args, **kwargs)
+  File "/home/jinming/venv_reasoning360mtl/lib64/python3.9/site-packages/ray/_private/client_mode_hook.py", line 104, in wrapper
+    return func(*args, **kwargs)
+  File "/home/jinming/venv_reasoning360mtl/lib64/python3.9/site-packages/ray/_private/worker.py", line 2858, in get
+    values, debugger_breakpoint = worker.get_objects(object_refs, timeout=timeout)
+  File "/home/jinming/venv_reasoning360mtl/lib64/python3.9/site-packages/ray/_private/worker.py", line 958, in get_objects
+    raise value.as_instanceof_cause()
+ray.exceptions.RayTaskError(AssertionError): [36mray::TaskRunner.run()[39m (pid=1554034, ip=10.128.9.112, actor_id=66ee216d70e6c6d97fdf05a401000000, repr=<main_ppo.TaskRunner object at 0x1525070dce50>)
+  File "/home/jinming/Reasoning360-MTL/verl/trainer/main_ppo.py", line 139, in run
+    trainer = RayPPOTrainer(
+  File "/home/jinming/Reasoning360-MTL/verl/trainer/ppo/ray_trainer.py", line 416, in __init__
+    self._validate_config()
+  File "/home/jinming/Reasoning360-MTL/verl/trainer/ppo/ray_trainer.py", line 433, in _validate_config
+    assert real_train_batch_size % minimal_bsz == 0, f"real_train_batch_size ({real_train_batch_size}) must be divisible by minimal possible batch size ({minimal_bsz})"
+AssertionError: real_train_batch_size (1) must be divisible by minimal possible batch size (2)
+
+Set the environment variable HYDRA_FULL_ERROR=1 for a complete stack trace.

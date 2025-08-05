@@ -1,0 +1,172 @@
+{
+  "domain": "math",
+  "total_tests": 10,
+  "successful_tests": 10,
+  "failed_tests": 0,
+  "success_rate": 1.0,
+  "data_sources": [
+    "math__deepscaler_preview",
+    "math__merged_deduped_dapo_or1_dataset"
+  ],
+  "rewards": {
+    "total_computed": 10,
+    "non_zero_count": 0,
+    "zero_count": 10,
+    "min_reward": 0.0,
+    "max_reward": 0.0,
+    "avg_reward": 0.0
+  },
+  "errors": [],
+  "detailed_results": [
+    {
+      "sample_idx": 0,
+      "data_source": "math__deepscaler_preview",
+      "has_ground_truth": true,
+      "ground_truth_type": "<class 'str'>",
+      "response_length": 0,
+      "success": true,
+      "score": {
+        "score": 0.0,
+        "acc": false
+      },
+      "error": null,
+      "score_type": "<class 'dict'>",
+      "final_reward": 0.0
+    },
+    {
+      "sample_idx": 1,
+      "data_source": "math__merged_deduped_dapo_or1_dataset",
+      "has_ground_truth": true,
+      "ground_truth_type": "<class 'str'>",
+      "response_length": 0,
+      "success": true,
+      "score": {
+        "score": 0.0,
+        "acc": false
+      },
+      "error": null,
+      "score_type": "<class 'dict'>",
+      "final_reward": 0.0
+    },
+    {
+      "sample_idx": 2,
+      "data_source": "math__merged_deduped_dapo_or1_dataset",
+      "has_ground_truth": true,
+      "ground_truth_type": "<class 'str'>",
+      "response_length": 0,
+      "success": true,
+      "score": {
+        "score": 0.0,
+        "acc": false
+      },
+      "error": null,
+      "score_type": "<class 'dict'>",
+      "final_reward": 0.0
+    },
+    {
+      "sample_idx": 3,
+      "data_source": "math__deepscaler_preview",
+      "has_ground_truth": true,
+      "ground_truth_type": "<class 'str'>",
+      "response_length": 0,
+      "success": true,
+      "score": {
+        "score": 0.0,
+        "acc": false
+      },
+      "error": null,
+      "score_type": "<class 'dict'>",
+      "final_reward": 0.0
+    },
+    {
+      "sample_idx": 4,
+      "data_source": "math__merged_deduped_dapo_or1_dataset",
+      "has_ground_truth": true,
+      "ground_truth_type": "<class 'str'>",
+      "response_length": 0,
+      "success": true,
+      "score": {
+        "score": 0.0,
+        "acc": false
+      },
+      "error": null,
+      "score_type": "<class 'dict'>",
+      "final_reward": 0.0
+    },
+    {
+      "sample_idx": 5,
+      "data_source": "math__merged_deduped_dapo_or1_dataset",
+      "has_ground_truth": true,
+      "ground_truth_type": "<class 'str'>",
+      "response_length": 0,
+      "success": true,
+      "score": {
+        "score": 0.0,
+        "acc": false
+      },
+      "error": null,
+      "score_type": "<class 'dict'>",
+      "final_reward": 0.0
+    },
+    {
+      "sample_idx": 6,
+      "data_source": "math__merged_deduped_dapo_or1_dataset",
+      "has_ground_truth": true,
+      "ground_truth_type": "<class 'str'>",
+      "response_length": 0,
+      "success": true,
+      "score": {
+        "score": 0.0,
+        "acc": false
+      },
+      "error": null,
+      "score_type": "<class 'dict'>",
+      "final_reward": 0.0
+    },
+    {
+      "sample_idx": 7,
+      "data_source": "math__deepscaler_preview",
+      "has_ground_truth": true,
+      "ground_truth_type": "<class 'str'>",
+      "response_length": 0,
+      "success": true,
+      "score": {
+        "score": 0.0,
+        "acc": false
+      },
+      "error": null,
+      "score_type": "<class 'dict'>",
+      "final_reward": 0.0
+    },
+    {
+      "sample_idx": 8,
+      "data_source": "math__deepscaler_preview",
+      "has_ground_truth": true,
+      "ground_truth_type": "<class 'str'>",
+      "response_length": 0,
+      "success": true,
+      "score": {
+        "score": 0.0,
+        "acc": false
+      },
+      "error": null,
+      "score_type": "<class 'dict'>",
+      "final_reward": 0.0
+    },
+    {
+      "sample_idx": 9,
+      "data_source": "math__merged_deduped_dapo_or1_dataset",
+      "has_ground_truth": true,
+      "ground_truth_type": "<class 'str'>",
+      "response_length": 0,
+      "success": true,
+      "score": {
+        "score": 0.0,
+        "acc": false
+      },
+      "error": null,
+      "score_type": "<class 'dict'>",
+      "final_reward": 0.0
+    }
+  ]
+}

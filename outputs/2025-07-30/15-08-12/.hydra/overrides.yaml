@@ -1,0 +1,7 @@
+- actor_rollout_ref.model.path=/home/jinming/llm_models/Qwen2.5-7B
+- data.tokenizer=/home/jinming/llm_models/Qwen2.5-7B
+- data.max_prompt_length=128
+- data.max_response_length=128
+- data.train_batch_size=4
+- actor_rollout_ref.rollout.n=1
+- +wandb.mode=disabled

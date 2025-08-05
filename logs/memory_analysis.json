@@ -1,0 +1,90 @@
+{
+  "timestamp": "2025-08-05 10:40:08",
+  "gpu_info": [
+    {
+      "index": 0,
+      "name": "NVIDIA A100-SXM4-80GB",
+      "memory_total_mb": 81920,
+      "memory_used_mb": 1,
+      "memory_free_mb": 81156,
+      "utilization_percent": 0
+    },
+    {
+      "index": 1,
+      "name": "NVIDIA A100-SXM4-80GB",
+      "memory_total_mb": 81920,
+      "memory_used_mb": 1,
+      "memory_free_mb": 81156,
+      "utilization_percent": 0
+    },
+    {
+      "index": 2,
+      "name": "NVIDIA A100-SXM4-80GB",
+      "memory_total_mb": 81920,
+      "memory_used_mb": 1,
+      "memory_free_mb": 81156,
+      "utilization_percent": 0
+    },
+    {
+      "index": 3,
+      "name": "NVIDIA A100-SXM4-80GB",
+      "memory_total_mb": 81920,
+      "memory_used_mb": 1,
+      "memory_free_mb": 81156,
+      "utilization_percent": 0
+    },
+    {
+      "index": 4,
+      "name": "NVIDIA A100-SXM4-80GB",
+      "memory_total_mb": 81920,
+      "memory_used_mb": 1,
+      "memory_free_mb": 81156,
+      "utilization_percent": 0
+    },
+    {
+      "index": 5,
+      "name": "NVIDIA A100-SXM4-80GB",
+      "memory_total_mb": 81920,
+      "memory_used_mb": 1,
+      "memory_free_mb": 81156,
+      "utilization_percent": 0
+    },
+    {
+      "index": 6,
+      "name": "NVIDIA A100-SXM4-80GB",
+      "memory_total_mb": 81920,
+      "memory_used_mb": 1,
+      "memory_free_mb": 81156,
+      "utilization_percent": 0
+    },
+    {
+      "index": 7,
+      "name": "NVIDIA A100-SXM4-80GB",
+      "memory_total_mb": 81920,
+      "memory_used_mb": 1,
+      "memory_free_mb": 81156,
+      "utilization_percent": 0
+    }
+  ],
+  "cpu_memory": {
+    "total_gb": 2015.68,
+    "available_gb": 1993.05,
+    "used_gb": 12.87,
+    "percent": 1.1
+  },
+  "model_estimates": {
+    "actor": 18.288,
+    "critic": 18.288,
+    "reference": 15.24,
+    "rollout_vllm": 25.240000000000002
+  },
+  "vllm_analysis": {
+    "kv_cache_per_seq_mb": 28.0,
+    "total_kv_cache_gb": 0.05,
+    "kv_cache_per_gpu_gb": 0.01,
+    "max_model_len": 512,
+    "max_num_seqs": 2,
+    "tensor_parallel_size": 4
+  },
+  "recommendations": []
+}

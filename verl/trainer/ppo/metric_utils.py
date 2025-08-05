@@ -264,7 +264,15 @@ def compute_throughout_metrics(batch: DataProto, timing_raw: Dict[str, float], n
         across different GPU counts.
     """
     total_num_tokens = sum(batch.meta_info["global_token_num"])
-    time = timing_raw["step"]
+    
+    # Handle missing 'step' key by using total time from all available timers
+    if "step" in timing_raw:
+        time = timing_raw["step"]
+    else:
+        # Fallback: sum all available timing measurements
+        time = sum(timing_raw.values()) if timing_raw else 1.0
+        print(f"Warning: 'step' key not found in timing_raw, using fallback time: {time}")
+        print(f"Available timing keys: {list(timing_raw.keys())}")
     # estimated_flops, promised_flops = flops_function.estimate_flops(num_tokens, time)
     # f'Actual TFLOPs/s/GPU​': estimated_flops/(n_gpus),
     # f'Theoretical TFLOPs/s/GPU​': promised_flops,

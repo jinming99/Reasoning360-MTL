@@ -1,0 +1,69 @@
+Lmod has detected the following error: The following module(s) are unknown:
+"cuda/12.4"
+
+Please check the spelling or version number. Also try "module spider ..."
+It is also possible your cache file is out-of-date; it may help to try:
+  $ module --ignore_cache load "cuda/12.4"
+
+Also make sure that all modulefiles written in TCL start with the string
+#%Module
+
+
+
+Lmod has detected the following error: The following module(s) are unknown:
+"python/3.9"
+
+Please check the spelling or version number. Also try "module spider ..."
+It is also possible your cache file is out-of-date; it may help to try:
+  $ module --ignore_cache load "python/3.9"
+
+Also make sure that all modulefiles written in TCL start with the string
+#%Module
+
+
+
+Collecting flash-attn==2.7.4.post1
+  Downloading flash_attn-2.7.4.post1.tar.gz (6.0 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 6.0/6.0 MB 36.7 MB/s eta 0:00:00
+  Preparing metadata (setup.py): started
+  Preparing metadata (setup.py): finished with status 'error'
+  error: subprocess-exited-with-error
+  
+  × python setup.py egg_info did not run successfully.
+  │ exit code: 1
+  ╰─> [19 lines of output]
+      /localscratch-nvme/3260380/pip-install-te2jisz0/flash-attn_86198f28b53749d0a5a26ab5201996a8/setup.py:106: UserWarning: flash_attn was requested, but nvcc was not found.  Are you sure your environment has nvcc available?  If you're installing within a container from https://hub.docker.com/r/pytorch/pytorch, only images whose names contain 'devel' will provide nvcc.
+        warnings.warn(
+      Traceback (most recent call last):
+        File "<string>", line 2, in <module>
+        File "<pip-setuptools-caller>", line 35, in <module>
+        File "/localscratch-nvme/3260380/pip-install-te2jisz0/flash-attn_86198f28b53749d0a5a26ab5201996a8/setup.py", line 198, in <module>
+          CUDAExtension(
+        File "/home/jinming/venv_reasoning360mtl/lib64/python3.9/site-packages/torch/utils/cpp_extension.py", line 1130, in CUDAExtension
+          library_dirs += library_paths(device_type="cuda")
+        File "/home/jinming/venv_reasoning360mtl/lib64/python3.9/site-packages/torch/utils/cpp_extension.py", line 1264, in library_paths
+          if (not os.path.exists(_join_cuda_home(lib_dir)) and
+        File "/home/jinming/venv_reasoning360mtl/lib64/python3.9/site-packages/torch/utils/cpp_extension.py", line 2525, in _join_cuda_home
+          raise OSError('CUDA_HOME environment variable is not set. '
+      OSError: CUDA_HOME environment variable is not set. Please set it to your CUDA install root.
+      
+      
+      torch.__version__  = 2.6.0+cu124
+      
+      
+      [end of output]
+  
+  note: This error originates from a subprocess, and is likely not a problem with pip.
+error: metadata-generation-failed
+
+× Encountered error while generating package metadata.
+╰─> See above for output.
+
+note: This is an issue with the package mentioned above, not pip.
+hint: See above for details.
+[validate_config] All configuration checks passed successfully!
+2025-07-31 08:16:00,611	INFO worker.py:1606 -- Using address 10.128.11.242:6379 set in the environment variable RAY_ADDRESS
+2025-07-31 08:16:00,631	INFO worker.py:1747 -- Connecting to existing Ray cluster at address: 10.128.11.242:6379...
+2025-07-31 08:16:01,640	INFO node.py:1102 -- Can't find a `node_ip_address.json` file from /localscratch/ray/session_2025-07-31_07-53-52_766860_712858. Have you started Ray instance using `ray start` or `ray.init`?
+2025-07-31 08:16:11,652	INFO node.py:1102 -- Can't find a `node_ip_address.json` file from /localscratch/ray/session_2025-07-31_07-53-52_766860_712858. Have you started Ray instance using `ray start` or `ray.init`?
+slurmstepd: error: *** JOB 3260380 ON tc-gpu002 CANCELLED AT 2025-07-31T08:16:14 ***

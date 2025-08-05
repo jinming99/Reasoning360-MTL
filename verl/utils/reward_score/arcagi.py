@@ -71,6 +71,14 @@ def compare_solutions_with_padding(generated_output, correct_output, pad_value=-
         - is_correct (bool): True if the solutions match exactly, False otherwise.
         - correct_percentage (float): The percentage of correctly matched pixels.
     """
+    # Handle empty or malformed arrays
+    if not generated_output or not correct_output:
+        return False, 0.0
+    
+    # Handle arrays with empty rows
+    if not generated_output[0] or not correct_output[0]:
+        return False, 0.0
+    
     max_rows = max(len(generated_output), len(correct_output))
     max_cols = max(len(generated_output[0]), len(correct_output[0]))
     target_shape = (max_rows, max_cols)
@@ -86,7 +94,13 @@ def compare_solutions_with_padding(generated_output, correct_output, pad_value=-
 
 
 def compute_score(model_output: str, ground_truth: np.ndarray, extra_info: any = None) -> float:
-    model_output = str(model_output)
-    final_answer = extract_solution(model_output)
-    is_correct, correct_percentage = compare_solutions_with_padding(final_answer, ground_truth)
-    return {"score": is_correct, "acc": is_correct}
+    try:
+        model_output = str(model_output)
+        final_answer = extract_solution(model_output)
+        is_correct, correct_percentage = compare_solutions_with_padding(final_answer, ground_truth)
+        return {"score": is_correct, "acc": is_correct}
+    except Exception as e:
+        print(f"Warning: ArcAGI scoring failed: {e}")
+        print(f"Model output: {model_output[:100]}...")
+        print(f"Ground truth type: {type(ground_truth)}")
+        return {"score": 0.0, "acc": 0.0}

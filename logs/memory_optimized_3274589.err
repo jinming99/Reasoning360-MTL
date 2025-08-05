@@ -1,0 +1,53 @@
+/home/jinming/Reasoning360-MTL/verl/__init__.py:18: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+2025-08-05 09:47:37,352	INFO worker.py:1747 -- Connecting to existing Ray cluster at address: 10.128.9.117:6379...
+2025-08-05 09:47:37,363	INFO worker.py:1927 -- Connected to Ray cluster.
+[36m(pid=2478135)[0m /home/jinming/Reasoning360-MTL/verl/__init__.py:18: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+[36m(pid=2478135)[0m   import pkg_resources
+Error executing job with overrides: ['data.train_files=[/home/jinming/Reasoning360-MTL/data/train/guru_18k/math.parquet]', 'data.val_files=[/home/jinming/Reasoning360-MTL/data/validation/guru_3k/math.parquet]', 'data.tokenizer=/home/jinming/Reasoning360-MTL/models/Qwen2.5-7B-Instruct', 'data.max_prompt_length=256', 'data.max_response_length=512', 'data.train_batch_size=8', 'data.gen_batch_size=8', 'actor_rollout_ref.model.path=/home/jinming/Reasoning360-MTL/models/Qwen2.5-7B-Instruct', 'actor_rollout_ref.actor.ppo_mini_batch_size=8', 'actor_rollout_ref.actor.ppo_micro_batch_size_per_gpu=1', 'actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=1', 'actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=1', 'actor_rollout_ref.rollout.n=1', 'actor_rollout_ref.rollout.name=vllm', 'actor_rollout_ref.rollout.gpu_memory_utilization=0.1', '++actor_rollout_ref.rollout.max_model_len=256', '++actor_rollout_ref.rollout.max_num_seqs=1', '++actor_rollout_ref.rollout.enforce_eager=true', '++actor_rollout_ref.rollout.tensor_parallel_size=2', '++actor_rollout_ref.rollout.device_map=[6,7]', 'actor_rollout_ref.rollout.temperature=1.0', 'actor_rollout_ref.rollout.top_p=1.0', 'actor_rollout_ref.rollout.top_k=-1', 'trainer.nnodes=1', 'trainer.n_gpus_per_node=8', 'trainer.total_epochs=30', 'trainer.val_before_train=false', 'trainer.test_freq=0', 'trainer.save_freq=5', 'trainer.project_name=Reasoning360-MTL', 'trainer.logger=[console]', 'algorithm.adv_estimator=grpo', '++actor_rollout_ref.fsdp_config.param_offload=true', '++actor_rollout_ref.fsdp_config.optimizer_offload=true', '++actor_rollout_ref.fsdp_config.activation_offload=true', '++actor_rollout_ref.model.enable_flash_attention=false', '++actor_rollout_ref.model.enable_gradient_checkpointing=true', '++actor_rollout_ref.model.enable_activation_offload=true', '++actor_rollout_ref.actor.entropy_checkpointing=true', '++actor_rollout_ref.ref.entropy_from_logits_with_chunking=true', '++actor_rollout_ref.rollout.multi_turn.enable=false', '++actor_rollout_ref.rollout.mode=sync', '+trainer.early_stopping_min_epochs=10', '+trainer.early_stopping_patience=5']
+Traceback (most recent call last):
+  File "/home/jinming/Reasoning360-MTL/verl/trainer/main_ppo.py", line 27, in main
+    run_ppo(config)
+  File "/home/jinming/Reasoning360-MTL/verl/trainer/main_ppo.py", line 39, in run_ppo
+    ray.get(runner.run.remote(config))
+  File "/home/jinming/venv_reasoning360mtl/lib64/python3.9/site-packages/ray/_private/auto_init_hook.py", line 22, in auto_init_wrapper
+    return fn(*args, **kwargs)
+  File "/home/jinming/venv_reasoning360mtl/lib64/python3.9/site-packages/ray/_private/client_mode_hook.py", line 104, in wrapper
+    return func(*args, **kwargs)
+  File "/home/jinming/venv_reasoning360mtl/lib64/python3.9/site-packages/ray/_private/worker.py", line 2858, in get
+    values, debugger_breakpoint = worker.get_objects(object_refs, timeout=timeout)
+  File "/home/jinming/venv_reasoning360mtl/lib64/python3.9/site-packages/ray/_private/worker.py", line 958, in get_objects
+    raise value.as_instanceof_cause()
+ray.exceptions.RayTaskError(HFValidationError): [36mray::TaskRunner.run()[39m (pid=2478135, ip=10.128.9.117, actor_id=4e3577c7fc8c97be522f388c01000000, repr=<main_ppo.TaskRunner object at 0x154eefe03d00>)
+  File "/home/jinming/venv_reasoning360mtl/lib64/python3.9/site-packages/huggingface_hub/utils/_validators.py", line 106, in _inner_fn
+    validate_repo_id(arg_value)
+  File "/home/jinming/venv_reasoning360mtl/lib64/python3.9/site-packages/huggingface_hub/utils/_validators.py", line 154, in validate_repo_id
+    raise HFValidationError(
+huggingface_hub.errors.HFValidationError: Repo id must be in the form 'repo_name' or 'namespace/repo_name': '/home/jinming/Reasoning360-MTL/models/Qwen2.5-7B-Instruct'. Use `repo_type` argument if needed.
+
+During handling of the above exception, another exception occurred:
+
+[36mray::TaskRunner.run()[39m (pid=2478135, ip=10.128.9.117, actor_id=4e3577c7fc8c97be522f388c01000000, repr=<main_ppo.TaskRunner object at 0x154eefe03d00>)
+  File "/home/jinming/Reasoning360-MTL/verl/trainer/main_ppo.py", line 62, in run
+    tokenizer = hf_tokenizer(local_path, trust_remote_code=trust_remote_code)
+  File "/home/jinming/Reasoning360-MTL/verl/utils/tokenizer.py", line 58, in hf_tokenizer
+    tokenizer = AutoTokenizer.from_pretrained(name_or_path, **kwargs)
+  File "/home/jinming/venv_reasoning360mtl/lib64/python3.9/site-packages/transformers/models/auto/tokenization_auto.py", line 945, in from_pretrained
+    tokenizer_config = get_tokenizer_config(pretrained_model_name_or_path, **kwargs)
+  File "/home/jinming/venv_reasoning360mtl/lib64/python3.9/site-packages/transformers/models/auto/tokenization_auto.py", line 777, in get_tokenizer_config
+    resolved_config_file = cached_file(
+  File "/home/jinming/venv_reasoning360mtl/lib64/python3.9/site-packages/transformers/utils/hub.py", line 266, in cached_file
+    file = cached_files(path_or_repo_id=path_or_repo_id, filenames=[filename], **kwargs)
+  File "/home/jinming/venv_reasoning360mtl/lib64/python3.9/site-packages/transformers/utils/hub.py", line 470, in cached_files
+    resolved_files = [
+  File "/home/jinming/venv_reasoning360mtl/lib64/python3.9/site-packages/transformers/utils/hub.py", line 471, in <listcomp>
+    _get_cache_file_to_return(path_or_repo_id, filename, cache_dir, revision) for filename in full_filenames
+  File "/home/jinming/venv_reasoning360mtl/lib64/python3.9/site-packages/transformers/utils/hub.py", line 134, in _get_cache_file_to_return
+    resolved_file = try_to_load_from_cache(path_or_repo_id, full_filename, cache_dir=cache_dir, revision=revision)
+  File "/home/jinming/venv_reasoning360mtl/lib64/python3.9/site-packages/huggingface_hub/utils/_validators.py", line 106, in _inner_fn
+    validate_repo_id(arg_value)
+  File "/home/jinming/venv_reasoning360mtl/lib64/python3.9/site-packages/huggingface_hub/utils/_validators.py", line 154, in validate_repo_id
+    raise HFValidationError(
+huggingface_hub.errors.HFValidationError: Repo id must be in the form 'repo_name' or 'namespace/repo_name': '/home/jinming/Reasoning360-MTL/models/Qwen2.5-7B-Instruct'. Use `repo_type` argument if needed.
+
+Set the environment variable HYDRA_FULL_ERROR=1 for a complete stack trace.

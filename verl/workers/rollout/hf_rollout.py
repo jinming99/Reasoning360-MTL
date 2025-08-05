@@ -132,7 +132,9 @@ class HFRollout(BaseRollout):
 
         if delta_length > 0:
             delta_tokens = torch.ones(size=(generated_batch_size, delta_length), device=seq.device, dtype=seq.dtype)
-            delta_tokens = pad_token_id * delta_tokens
+            # Use eos_token_id as fallback if pad_token_id is None
+            effective_pad_token_id = pad_token_id if pad_token_id is not None else eos_token_id
+            delta_tokens = effective_pad_token_id * delta_tokens
             seq = torch.cat((seq, delta_tokens), dim=1)
         assert seq.shape[1] == sequence_length
 

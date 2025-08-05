@@ -1,0 +1,253 @@
+{
+  "model_name": "Qwen/Qwen2.5-1.5B",
+  "total_samples": 12,
+  "successful_samples": 11,
+  "success_rate": 0.9166666666666666,
+  "non_zero_rewards": 0,
+  "non_zero_rate": 0.0,
+  "avg_reward": 0.0,
+  "domain_summaries": {
+    "math": {
+      "total_samples": 2,
+      "successful": 2,
+      "success_rate": 1.0,
+      "non_zero_rewards": 0,
+      "avg_reward": 0.0,
+      "max_reward": 0.0,
+      "data_sources": [
+        "math__deepscaler_preview",
+        "math__merged_deduped_dapo_or1_dataset"
+      ]
+    },
+    "logic": {
+      "total_samples": 2,
+      "successful": 1,
+      "success_rate": 0.5,
+      "non_zero_rewards": 0,
+      "avg_reward": 0.0,
+      "max_reward": 0.0,
+      "data_sources": [
+        "logic__graph_logical_dataset",
+        "simulation__barc"
+      ]
+    },
+    "codegen": {
+      "total_samples": 2,
+      "successful": 2,
+      "success_rate": 1.0,
+      "non_zero_rewards": 0,
+      "avg_reward": 0.0,
+      "max_reward": 0.0,
+      "data_sources": [
+        "codegen__taco"
+      ]
+    },
+    "simulation": {
+      "total_samples": 2,
+      "successful": 2,
+      "success_rate": 1.0,
+      "non_zero_rewards": 0,
+      "avg_reward": 0.0,
+      "max_reward": 0.0,
+      "data_sources": [
+        "simulation__codeio"
+      ]
+    },
+    "stem": {
+      "total_samples": 2,
+      "successful": 2,
+      "success_rate": 1.0,
+      "non_zero_rewards": 0,
+      "avg_reward": 0.0,
+      "max_reward": 0.0,
+      "data_sources": [
+        "stem_web"
+      ]
+    },
+    "table": {
+      "total_samples": 2,
+      "successful": 2,
+      "success_rate": 1.0,
+      "non_zero_rewards": 0,
+      "avg_reward": 0.0,
+      "max_reward": 0.0,
+      "data_sources": [
+        "table__hitab"
+      ]
+    }
+  },
+  "detailed_results": [
+    {
+      "domain": "math",
+      "sample_idx": 0,
+      "data_source": "math__deepscaler_preview",
+      "prompt_length": 396,
+      "response_length": 0,
+      "response": "",
+      "ground_truth": "4\\sqrt{3}",
+      "score": {
+        "score": 0.0,
+        "acc": false
+      },
+      "final_reward": 0.0,
+      "success": true
+    },
+    {
+      "domain": "math",
+      "sample_idx": 1,
+      "data_source": "math__merged_deduped_dapo_or1_dataset",
+      "prompt_length": 1147,
+      "response_length": 0,
+      "response": "",
+      "ground_truth": "81",
+      "score": {
+        "score": 0.0,
+        "acc": false
+      },
+      "final_reward": 0.0,
+      "success": true
+    },
+    {
+      "domain": "logic",
+      "sample_idx": 0,
+      "data_source": "logic__graph_logical_dataset",
+      "prompt_length": 2963,
+      "response_length": 0,
+      "response": "",
+      "ground_truth": "sodnei",
+      "score": {
+        "score": 0.0,
+        "acc": 0.0
+      },
+      "final_reward": 0.0,
+      "success": true
+    },
+    {
+      "domain": "logic",
+      "sample_idx": 1,
+      "data_source": "simulation__barc",
+      "prompt_length": 3934,
+      "response_length": 136,
+      "response": "0, 0, 1, 0, 0, 1, 0, 1, 0], [0, 1, 0, 0, 1, 0, 1, 0, 1], [1, 0, 1, 0, 0, 0, 0, 0, 0], [0, 1, 0, 0, 0, 1, 0, 1, 0], [0, 0, 0, 0, 0, 0, 0,",
+      "ground_truth": "[[0 2 0 0 0]\n [0 0 0 0 0]\n [1 1 0 0 1]\n [0 0 1 1 1]\n [0 0 1 0 1]\n [0 0 0 0 0]]",
+      "score": null,
+      "final_reward": 0.0,
+      "success": false,
+      "error": "The truth value of an array with more than one element is ambiguous. Use a.any() or a.all()"
+    },
+    {
+      "domain": "codegen",
+      "sample_idx": 0,
+      "data_source": "codegen__taco",
+      "prompt_length": 1350,
+      "response_length": 0,
+      "response": "",
+      "ground_truth": "{\"inputs\": [\"2\\n85\\n114\"], \"outputs\": [\"2\\n4\"]}",
+      "score": {
+        "score": 0.0,
+        "acc": 0.0
+      },
+      "final_reward": 0.0,
+      "success": true
+    },
+    {
+      "domain": "codegen",
+      "sample_idx": 1,
+      "data_source": "codegen__taco",
+      "prompt_length": 2661,
+      "response_length": 378,
+      "response": "[{'content': \"import sys\\nn, k = map(int, sys.stdin.readline().split())\\nai = list(map(int, sys.stdin.readline().split()))\\nadj = [[] for _ in range(n)]\\nfor _ in range(n - 1):\\n    u, v = map(int, sys.stdin.readline().split())\\n    adj[u - 1].append(v - 1)\\n    adj[v - 1].append(u - 1)\\n\\ndef dfs(node, parent):\\n    if len(adj[node]) <= k:\\n        return ai[node]\\n    res =",
+      "ground_truth": "{\"inputs\": [\"10 10\\n794273 814140 758469 932911 607860 1310013 987442 652494 952171 698608\\n1 3\\n3 8",
+      "score": {
+        "score": 0.0,
+        "acc": 0.0
+      },
+      "final_reward": 0.0,
+      "success": true
+    },
+    {
+      "domain": "simulation",
+      "sample_idx": 0,
+      "data_source": "simulation__codeio",
+      "prompt_length": 2653,
+      "response_length": 3,
+      "response": "```",
+      "ground_truth": "\"output\": false",
+      "score": {
+        "score": false,
+        "acc": false
+      },
+      "final_reward": 0.0,
+      "success": true
+    },
+    {
+      "domain": "simulation",
+      "sample_idx": 1,
+      "data_source": "simulation__codeio",
+      "prompt_length": 3479,
+      "response_length": 0,
+      "response": "",
+      "ground_truth": "\"output\": 68",
+      "score": {
+        "score": false,
+        "acc": false
+      },
+      "final_reward": 0.0,
+      "success": true
+    },
+    {
+      "domain": "stem",
+      "sample_idx": 0,
+      "data_source": "stem_web",
+      "prompt_length": 960,
+      "response_length": 490,
+      "response": "[{'content': 'This problem can be solved by performing stoichiometry calculations to determine the moles of hydrogen chloride (HCl) and aluminum (Al) involved in the reaction. We'll start by calculating the moles of HCl and Al, then use these values to find the moles of HCl that react with the metal. Finally, we'll use the given volume of NaOH to find the moles of Al that reacted.\\n\\nStep 1: Calculate the moles of HCl and Al\\nMoles of Al = mass of Al / molar mass of Al\\nMoles of Al = 1",
+      "ground_truth": "2.95:1",
+      "score": 0.0,
+      "final_reward": 0.0,
+      "success": true
+    },
+    {
+      "domain": "stem",
+      "sample_idx": 1,
+      "data_source": "stem_web",
+      "prompt_length": 817,
+      "response_length": 0,
+      "response": "",
+      "ground_truth": "1.25 m",
+      "score": 0.0,
+      "final_reward": 0.0,
+      "success": true
+    },
+    {
+      "domain": "table",
+      "sample_idx": 0,
+      "data_source": "table__hitab",
+      "prompt_length": 3860,
+      "response_length": 151,
+      "response": "3.0 | 34.6 | 32.6 | 37.2 | 27.4 | 33.9 | 28.5 | 37.1 | 27.6 | 34.4 | 27.7 | 36.5 |\\n| 18 to 19 | 187.2 | 39.3 | 35.3 | 42.2 | 97.7 | 45.0 | 39.9 | 46.1",
+      "ground_truth": "62.3",
+      "score": {
+        "score": false,
+        "acc": false
+      },
+      "final_reward": 0.0,
+      "success": true
+    },
+    {
+      "domain": "table",
+      "sample_idx": 1,
+      "data_source": "table__hitab",
+      "prompt_length": 960,
+      "response_length": 4,
+      "response": "}}]}",
+      "ground_truth": "2.451602",
+      "score": {
+        "score": false,
+        "acc": false
+      },
+      "final_reward": 0.0,
+      "success": true
+    }
+  ]
+}

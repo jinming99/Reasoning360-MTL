@@ -1,0 +1,8 @@
+/home/jinming/Reasoning360-MTL/verl/__init__.py:18: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+Ambiguous value for argument '++actor_rollout_ref.rollout.device_map=6,7'
+1. To use it as a list, use key=[value1,value2]
+2. To use it as string, quote the value: key=\'value1,value2\'
+3. To sweep over it, add --multirun to your command line
+
+Set the environment variable HYDRA_FULL_ERROR=1 for a complete stack trace.

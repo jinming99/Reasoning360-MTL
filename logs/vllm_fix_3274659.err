@@ -1,0 +1,61 @@
+/home/jinming/Reasoning360-MTL/verl/__init__.py:18: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+2025-08-05 11:05:38,452	INFO worker.py:1747 -- Connecting to existing Ray cluster at address: 10.128.9.117:6379...
+2025-08-05 11:05:38,466	INFO worker.py:1918 -- Connected to Ray cluster. View the dashboard at [1m[32m10.128.9.117:8265 [39m[22m
+[36m(pid=2739229)[0m /home/jinming/Reasoning360-MTL/verl/__init__.py:18: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+[36m(pid=2739229)[0m   import pkg_resources
+Error executing job with overrides: ['data.train_files=/home/jinming/Reasoning360-MTL/data/math.parquet', 'data.val_files=/home/jinming/Reasoning360-MTL/data/math.parquet', 'data.tokenizer=/home/jinming/llm_models/Qwen2.5-7B', 'data.max_prompt_length=256', 'data.max_response_length=512', 'data.train_batch_size=4', 'data.gen_batch_size=4', 'actor_rollout_ref.model.path=/home/jinming/llm_models/Qwen2.5-7B', 'actor_rollout_ref.actor.ppo_mini_batch_size=4', 'actor_rollout_ref.actor.ppo_micro_batch_size_per_gpu=1', 'actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=1', 'actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=1', 'actor_rollout_ref.rollout.n=1', 'actor_rollout_ref.rollout.name=vllm', 'actor_rollout_ref.rollout.gpu_memory_utilization=0.02', '++actor_rollout_ref.rollout.max_model_len=64', '++actor_rollout_ref.rollout.max_num_seqs=1', '++actor_rollout_ref.rollout.enforce_eager=true', '++actor_rollout_ref.rollout.tensor_parallel_size=2', '++actor_rollout_ref.rollout.device_map=[6,7]', '++actor_rollout_ref.rollout.disable_custom_all_reduce=true', '++actor_rollout_ref.rollout.enable_prefix_caching=false', '++actor_rollout_ref.rollout.use_v2_block_manager=false', '++actor_rollout_ref.rollout.swap_space=0', '++actor_rollout_ref.rollout.cpu_offload_gb=0', '++actor_rollout_ref.rollout.trust_remote_code=true', '++actor_rollout_ref.rollout.disable_sliding_window=true', '++actor_rollout_ref.rollout.disable_log_stats=true', 'actor_rollout_ref.rollout.temperature=1.0', 'actor_rollout_ref.rollout.top_p=1.0', 'actor_rollout_ref.rollout.top_k=-1', 'trainer.nnodes=1', 'trainer.n_gpus_per_node=8', 'trainer.total_epochs=1', 'trainer.val_before_train=false', 'trainer.test_freq=0', 'trainer.save_freq=-1', 'trainer.project_name=vllm_memory_fix_test', 'trainer.logger=[console]', 'algorithm.adv_estimator=grpo']
+Traceback (most recent call last):
+  File "/home/jinming/Reasoning360-MTL/verl/trainer/main_ppo.py", line 27, in main
+    run_ppo(config)
+  File "/home/jinming/Reasoning360-MTL/verl/trainer/main_ppo.py", line 39, in run_ppo
+    ray.get(runner.run.remote(config))
+  File "/home/jinming/venv_reasoning360mtl/lib64/python3.9/site-packages/ray/_private/auto_init_hook.py", line 22, in auto_init_wrapper
+    return fn(*args, **kwargs)
+  File "/home/jinming/venv_reasoning360mtl/lib64/python3.9/site-packages/ray/_private/client_mode_hook.py", line 104, in wrapper
+    return func(*args, **kwargs)
+  File "/home/jinming/venv_reasoning360mtl/lib64/python3.9/site-packages/ray/_private/worker.py", line 2858, in get
+    values, debugger_breakpoint = worker.get_objects(object_refs, timeout=timeout)
+  File "/home/jinming/venv_reasoning360mtl/lib64/python3.9/site-packages/ray/_private/worker.py", line 958, in get_objects
+    raise value.as_instanceof_cause()
+ray.exceptions.RayTaskError(FileNotFoundError): [36mray::TaskRunner.run()[39m (pid=2739229, ip=10.128.9.117, actor_id=6ff859758ff6340fdc2f163c01000000, repr=<main_ppo.TaskRunner object at 0x15247f07dca0>)
+  File "/home/jinming/venv_reasoning360mtl/lib64/python3.9/site-packages/pandas/io/parquet.py", line 669, in read_parquet
+    return impl.read(
+  File "/home/jinming/venv_reasoning360mtl/lib64/python3.9/site-packages/pandas/io/parquet.py", line 258, in read
+    path_or_handle, handles, filesystem = _get_path_or_handle(
+  File "/home/jinming/venv_reasoning360mtl/lib64/python3.9/site-packages/pandas/io/parquet.py", line 141, in _get_path_or_handle
+    handles = get_handle(
+  File "/home/jinming/venv_reasoning360mtl/lib64/python3.9/site-packages/pandas/io/common.py", line 882, in get_handle
+    handle = open(handle, ioargs.mode)
+FileNotFoundError: [Errno 2] No such file or directory: '/home/jinming/Reasoning360-MTL/data/math.parquet'
+
+During handling of the above exception, another exception occurred:
+
+[36mray::TaskRunner.run()[39m (pid=2739229, ip=10.128.9.117, actor_id=6ff859758ff6340fdc2f163c01000000, repr=<main_ppo.TaskRunner object at 0x15247f07dca0>)
+  File "/home/jinming/Reasoning360-MTL/verl/trainer/main_ppo.py", line 136, in run
+    train_dataset = create_rl_dataset(config.data.train_files, config.data, tokenizer, processor)
+  File "/home/jinming/Reasoning360-MTL/verl/trainer/main_ppo.py", line 183, in create_rl_dataset
+    dataset = dataset_cls(
+  File "/home/jinming/Reasoning360-MTL/verl/utils/dataset/rl_dataset.py", line 145, in __init__
+    self._read_files_and_tokenize()
+  File "/home/jinming/Reasoning360-MTL/verl/utils/dataset/rl_dataset.py", line 165, in _read_files_and_tokenize
+    dataframe = pl.read_parquet(parquet_file).to_pandas()
+  File "/home/jinming/venv_reasoning360mtl/lib64/python3.9/site-packages/polars/_utils/deprecation.py", line 128, in wrapper
+    return function(*args, **kwargs)
+  File "/home/jinming/venv_reasoning360mtl/lib64/python3.9/site-packages/polars/_utils/deprecation.py", line 128, in wrapper
+    return function(*args, **kwargs)
+  File "/home/jinming/venv_reasoning360mtl/lib64/python3.9/site-packages/polars/io/parquet/functions.py", line 283, in read_parquet
+    return lf.collect()
+  File "/home/jinming/venv_reasoning360mtl/lib64/python3.9/site-packages/polars/_utils/deprecation.py", line 97, in wrapper
+    return function(*args, **kwargs)
+  File "/home/jinming/venv_reasoning360mtl/lib64/python3.9/site-packages/polars/lazyframe/opt_flags.py", line 330, in wrapper
+    return function(*args, **kwargs)
+  File "/home/jinming/venv_reasoning360mtl/lib64/python3.9/site-packages/polars/lazyframe/frame.py", line 2332, in collect
+    return wrap_df(ldf.collect(engine, callback))
+FileNotFoundError: No such file or directory (os error 2): /home/jinming/Reasoning360-MTL/data/math.parquet
+
+This error occurred with the following context stack:
+	[1] 'parquet scan'
+	[2] 'sink'
+
+Set the environment variable HYDRA_FULL_ERROR=1 for a complete stack trace.

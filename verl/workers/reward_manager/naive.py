@@ -64,40 +64,71 @@ class NaiveRewardManager:
 
             # Debug reward_model structure
             reward_model = data_item.non_tensor_batch.get("reward_model", {})
-            print(f"Debug: reward_model type: {type(reward_model)}, content: {reward_model}")
+            print(f"\n=== REWARD DEBUG START ===")
+            print(f"Debug: reward_model type: {type(reward_model)}")
+            print(f"Debug: reward_model content: {repr(reward_model)[:200]}...")
+            print(f"Debug: data_source: {data_item.non_tensor_batch.get(self.reward_fn_key, 'UNKNOWN')}")
             
             # Handle different reward_model formats
             if isinstance(reward_model, str):
                 try:
+                    # First try ast.literal_eval for simple cases
                     import ast
                     reward_model = ast.literal_eval(reward_model)
                     print(f"Debug: parsed reward_model: {reward_model}")
                 except (ValueError, SyntaxError, TypeError) as e:
-                    print(f"Debug: failed to parse reward_model string: {e}")
-                    reward_model = {}
+                    print(f"Debug: failed to parse reward_model string with ast: {e}")
+                    # Try eval for numpy arrays (safe in this controlled context)
+                    try:
+                        import numpy as np
+                        # Make numpy available for eval
+                        reward_model = eval(reward_model, {'array': np.array, 'dtype': np.dtype, 'object': object, '__builtins__': {}})
+                        print(f"Debug: parsed reward_model with eval: {type(reward_model)}")
+                    except Exception as e2:
+                        print(f"Debug: failed to parse reward_model with eval: {e2}")
+                        reward_model = {}
             
             ground_truth = reward_model.get("ground_truth", "")
+            print(f"Debug: extracted ground_truth type: {type(ground_truth)}")
+            print(f"Debug: extracted ground_truth: {repr(str(ground_truth)[:100])}...")
+            
             if not ground_truth:
                 print(f"Warning: No ground_truth found in reward_model, using empty string")
+            else:
+                print(f"Debug: ground_truth is valid, length: {len(str(ground_truth))}")
 
             data_source = data_item.non_tensor_batch[self.reward_fn_key]
 
             extra_info = data_item.non_tensor_batch.get("extra_info", None)
 
+            print(f"Debug: calling compute_score with:")
+            print(f"  - data_source: {data_source}")
+            print(f"  - solution_str length: {len(response_str)}")
+            print(f"  - solution_str preview: {repr(response_str[:100])}...")
+            print(f"  - ground_truth type: {type(ground_truth)}")
+            print(f"  - extra_info: {extra_info}")
+            
             score = self.compute_score(
                 data_source=data_source,
                 solution_str=response_str,
                 ground_truth=ground_truth,
                 extra_info=extra_info,
             )
+            
+            print(f"Debug: compute_score returned: {score} (type: {type(score)})")
 
             if isinstance(score, dict):
                 reward = score["score"]
+                print(f"Debug: extracted reward from dict: {reward}")
                 # Store the information including original reward
                 for key, value in score.items():
                     reward_extra_info[key].append(value)
             else:
                 reward = score
+                print(f"Debug: using score directly as reward: {reward}")
+                
+            print(f"Debug: final reward value: {reward}")
+            print(f"=== REWARD DEBUG END ===\n")
 
             reward_tensor[i, valid_response_length - 1] = reward
 

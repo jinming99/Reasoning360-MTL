@@ -340,9 +340,16 @@ class DataProto:
             assert len(self.batch.batch_size) == 1, "only support num_batch_dims=1 when non_tensor_batch is not empty."
 
             batch_size = self.batch.batch_size[0]
+            
+            # Check for batch size mismatches
+            mismatched_keys = []
             for key, val in self.non_tensor_batch.items():
                 assert isinstance(val, np.ndarray), f"data in the non_tensor_batch must be a numpy.array with dtype=object, but for {key=}, got {type(val)=}"
-                assert val.shape[0] == batch_size, f"key {key} length {len(val)} is not equal to batch size {batch_size}"
+                if val.shape[0] != batch_size:
+                    mismatched_keys.append(f"{key} (len={val.shape[0]})")
+                    
+            if mismatched_keys:
+                raise AssertionError(f"Batch size mismatches found: {', '.join(mismatched_keys)} vs expected batch_size={batch_size}")
 
     @classmethod
     def from_single_dict(cls, data: Dict[str, Union[torch.Tensor, np.ndarray]], meta_info=None, auto_padding=False):

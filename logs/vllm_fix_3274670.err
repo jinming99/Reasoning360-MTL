@@ -1,0 +1,101 @@
+/home/jinming/Reasoning360-MTL/verl/__init__.py:18: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+2025-08-05 11:11:51,806	INFO worker.py:1747 -- Connecting to existing Ray cluster at address: 10.128.9.117:6379...
+2025-08-05 11:11:51,817	INFO worker.py:1918 -- Connected to Ray cluster. View the dashboard at [1m[32m10.128.9.117:8265 [39m[22m
+[36m(pid=2772649)[0m /home/jinming/Reasoning360-MTL/verl/__init__.py:18: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+[36m(pid=2772649)[0m   import pkg_resources
+[36m(TaskRunner pid=2772649)[0m DeprecationWarning: `ray.state.available_resources_per_node` is a private attribute and access will be removed in a future Ray version.
+[36m(TaskRunner pid=2772649)[0m WARNING:2025-08-05 11:12:21,427:Waiting for register center actor exXVnw_register_center to be ready. Elapsed time: 0 seconds out of 300 seconds.
+[36m(pid=2775816)[0m /home/jinming/Reasoning360-MTL/verl/__init__.py:18: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+[36m(pid=2775816)[0m   import pkg_resources
+[36m(pid=2776050)[0m /home/jinming/Reasoning360-MTL/verl/__init__.py:18: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+[36m(pid=2776050)[0m   import pkg_resources
+[36m(pid=2776052)[0m /home/jinming/Reasoning360-MTL/verl/__init__.py:18: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+[36m(pid=2776052)[0m   import pkg_resources
+[36m(pid=2776053)[0m /home/jinming/Reasoning360-MTL/verl/__init__.py:18: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+[36m(pid=2776053)[0m   import pkg_resources
+[36m(pid=2776054)[0m /home/jinming/Reasoning360-MTL/verl/__init__.py:18: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+[36m(pid=2776054)[0m   import pkg_resources
+[36m(pid=2776055)[0m /home/jinming/Reasoning360-MTL/verl/__init__.py:18: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+[36m(pid=2776055)[0m   import pkg_resources
+[36m(pid=2776056)[0m /home/jinming/Reasoning360-MTL/verl/__init__.py:18: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+[36m(pid=2776056)[0m   import pkg_resources
+[36m(pid=2776059)[0m /home/jinming/Reasoning360-MTL/verl/__init__.py:18: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+[36m(pid=2776059)[0m   import pkg_resources
+Error executing job with overrides: ['data.train_files=/home/jinming/Reasoning360-MTL/data/train/guru_18k/math.parquet', 'data.val_files=/home/jinming/Reasoning360-MTL/data/train/guru_18k/math.parquet', 'data.tokenizer=/home/jinming/llm_models/Qwen2.5-7B', 'data.max_prompt_length=256', 'data.max_response_length=512', 'data.train_batch_size=8', 'data.gen_batch_size=8', 'actor_rollout_ref.model.path=/home/jinming/llm_models/Qwen2.5-7B', 'actor_rollout_ref.actor.ppo_mini_batch_size=4', 'actor_rollout_ref.actor.ppo_micro_batch_size_per_gpu=1', 'actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=1', 'actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=1', 'actor_rollout_ref.rollout.n=1', 'actor_rollout_ref.rollout.name=vllm', 'actor_rollout_ref.rollout.gpu_memory_utilization=0.02', '++actor_rollout_ref.rollout.max_model_len=64', '++actor_rollout_ref.rollout.max_num_seqs=1', '++actor_rollout_ref.rollout.enforce_eager=true', '++actor_rollout_ref.rollout.tensor_parallel_size=2', '++actor_rollout_ref.rollout.device_map=[6,7]', '++actor_rollout_ref.rollout.disable_custom_all_reduce=true', '++actor_rollout_ref.rollout.enable_prefix_caching=false', '++actor_rollout_ref.rollout.use_v2_block_manager=false', '++actor_rollout_ref.rollout.swap_space=0', '++actor_rollout_ref.rollout.cpu_offload_gb=0', '++actor_rollout_ref.rollout.trust_remote_code=true', '++actor_rollout_ref.rollout.disable_sliding_window=true', '++actor_rollout_ref.rollout.disable_log_stats=true', 'actor_rollout_ref.rollout.temperature=1.0', 'actor_rollout_ref.rollout.top_p=1.0', 'actor_rollout_ref.rollout.top_k=-1', 'trainer.nnodes=1', 'trainer.n_gpus_per_node=8', 'trainer.total_epochs=1', 'trainer.val_before_train=false', 'trainer.test_freq=0', 'trainer.save_freq=-1', 'trainer.project_name=vllm_memory_fix_test', 'trainer.logger=[console]', 'algorithm.adv_estimator=grpo']
+Traceback (most recent call last):
+  File "/home/jinming/Reasoning360-MTL/verl/trainer/main_ppo.py", line 27, in main
+    run_ppo(config)
+  File "/home/jinming/Reasoning360-MTL/verl/trainer/main_ppo.py", line 39, in run_ppo
+    ray.get(runner.run.remote(config))
+  File "/home/jinming/venv_reasoning360mtl/lib64/python3.9/site-packages/ray/_private/auto_init_hook.py", line 22, in auto_init_wrapper
+    return fn(*args, **kwargs)
+  File "/home/jinming/venv_reasoning360mtl/lib64/python3.9/site-packages/ray/_private/client_mode_hook.py", line 104, in wrapper
+    return func(*args, **kwargs)
+  File "/home/jinming/venv_reasoning360mtl/lib64/python3.9/site-packages/ray/_private/worker.py", line 2858, in get
+    values, debugger_breakpoint = worker.get_objects(object_refs, timeout=timeout)
+  File "/home/jinming/venv_reasoning360mtl/lib64/python3.9/site-packages/ray/_private/worker.py", line 958, in get_objects
+    raise value.as_instanceof_cause()
+ray.exceptions.RayTaskError(ActorDiedError): [36mray::TaskRunner.run()[39m (pid=2772649, ip=10.128.9.117, actor_id=5bc366538405a283c8be016201000000, repr=<main_ppo.TaskRunner object at 0x15247f07dd00>)
+  File "/home/jinming/Reasoning360-MTL/verl/trainer/main_ppo.py", line 154, in run
+    trainer.init_workers()
+  File "/home/jinming/Reasoning360-MTL/verl/trainer/ppo/ray_trainer.py", line 736, in init_workers
+    self.actor_rollout_wg.init_model()
+  File "/home/jinming/Reasoning360-MTL/verl/single_controller/ray/base.py", line 51, in __call__
+    output = ray.get(output)
+ray.exceptions.ActorDiedError: The actor died because of an error raised in its creation task, [36mray::exXVnwWorkerDict_0:4:WorkerDict.__init__()[39m (pid=2776054, ip=10.128.9.117, actor_id=0e6165e09c8ec54167dd3be101000000, repr=<verl.single_controller.ray.base.WorkerDict object at 0x1524f1656160>)
+  File "/home/jinming/Reasoning360-MTL/verl/single_controller/ray/base.py", line 815, in __init__
+    self.worker_dict[key] = user_defined_cls(*init_args_dict[key].get("args", ()), **init_args_dict[key].get("kwargs", {}))
+  File "/home/jinming/Reasoning360-MTL/verl/workers/fsdp_workers.py", line 147, in __init__
+    assert self.config.actor.ppo_mini_batch_size > 0, f"ppo_mini_batch_size {self.config.actor.ppo_mini_batch_size} should be larger than 0 after normalization"
+AssertionError: ppo_mini_batch_size 0 should be larger than 0 after normalization
+
+Set the environment variable HYDRA_FULL_ERROR=1 for a complete stack trace.
+[36m(WorkerDict pid=2775816)[0m Exception raised in creation task: The actor died because of an error raised in its creation task, [36mray::exXVnwWorkerDict_0:0:WorkerDict.__init__()[39m (pid=2775816, ip=10.128.9.117, actor_id=c96bcfda30fb45b2dbe077d801000000, repr=<verl.single_controller.ray.base.WorkerDict object at 0x1524f56b2610>)
+[36m(WorkerDict pid=2775816)[0m   File "/home/jinming/Reasoning360-MTL/verl/single_controller/ray/base.py", line 815, in __init__
+[36m(WorkerDict pid=2775816)[0m     self.worker_dict[key] = user_defined_cls(*init_args_dict[key].get("args", ()), **init_args_dict[key].get("kwargs", {}))
+[36m(WorkerDict pid=2775816)[0m   File "/home/jinming/Reasoning360-MTL/verl/workers/fsdp_workers.py", line 147, in __init__
+[36m(WorkerDict pid=2775816)[0m     assert self.config.actor.ppo_mini_batch_size > 0, f"ppo_mini_batch_size {self.config.actor.ppo_mini_batch_size} should be larger than 0 after normalization"
+[36m(WorkerDict pid=2775816)[0m AssertionError: ppo_mini_batch_size 0 should be larger than 0 after normalization
+[36m(WorkerDict pid=2776050)[0m Exception raised in creation task: The actor died because of an error raised in its creation task, [36mray::exXVnwWorkerDict_0:1:WorkerDict.__init__()[39m (pid=2776050, ip=10.128.9.117, actor_id=d42c76020308ff697aa6515c01000000, repr=<verl.single_controller.ray.base.WorkerDict object at 0x1524f1600160>)
+[36m(WorkerDict pid=2776050)[0m   File "/home/jinming/Reasoning360-MTL/verl/single_controller/ray/base.py", line 815, in __init__
+[36m(WorkerDict pid=2776050)[0m     self.worker_dict[key] = user_defined_cls(*init_args_dict[key].get("args", ()), **init_args_dict[key].get("kwargs", {}))
+[36m(WorkerDict pid=2776050)[0m   File "/home/jinming/Reasoning360-MTL/verl/workers/fsdp_workers.py", line 147, in __init__
+[36m(WorkerDict pid=2776050)[0m     assert self.config.actor.ppo_mini_batch_size > 0, f"ppo_mini_batch_size {self.config.actor.ppo_mini_batch_size} should be larger than 0 after normalization"
+[36m(WorkerDict pid=2776050)[0m AssertionError: ppo_mini_batch_size 0 should be larger than 0 after normalization
+[36m(WorkerDict pid=2776052)[0m Exception raised in creation task: The actor died because of an error raised in its creation task, [36mray::exXVnwWorkerDict_0:2:WorkerDict.__init__()[39m (pid=2776052, ip=10.128.9.117, actor_id=8ecbcc8b19186d3622f7978701000000, repr=<verl.single_controller.ray.base.WorkerDict object at 0x1524f16d2790>)
+[36m(WorkerDict pid=2776052)[0m   File "/home/jinming/Reasoning360-MTL/verl/single_controller/ray/base.py", line 815, in __init__
+[36m(WorkerDict pid=2776052)[0m     self.worker_dict[key] = user_defined_cls(*init_args_dict[key].get("args", ()), **init_args_dict[key].get("kwargs", {}))
+[36m(WorkerDict pid=2776052)[0m   File "/home/jinming/Reasoning360-MTL/verl/workers/fsdp_workers.py", line 147, in __init__
+[36m(WorkerDict pid=2776052)[0m     assert self.config.actor.ppo_mini_batch_size > 0, f"ppo_mini_batch_size {self.config.actor.ppo_mini_batch_size} should be larger than 0 after normalization"
+[36m(WorkerDict pid=2776052)[0m AssertionError: ppo_mini_batch_size 0 should be larger than 0 after normalization
+[36m(WorkerDict pid=2776053)[0m Exception raised in creation task: The actor died because of an error raised in its creation task, [36mray::exXVnwWorkerDict_0:3:WorkerDict.__init__()[39m (pid=2776053, ip=10.128.9.117, actor_id=e1a0945662babd4825a4304101000000, repr=<verl.single_controller.ray.base.WorkerDict object at 0x1524f16bf070>)
+[36m(WorkerDict pid=2776053)[0m   File "/home/jinming/Reasoning360-MTL/verl/single_controller/ray/base.py", line 815, in __init__
+[36m(WorkerDict pid=2776053)[0m     self.worker_dict[key] = user_defined_cls(*init_args_dict[key].get("args", ()), **init_args_dict[key].get("kwargs", {}))
+[36m(WorkerDict pid=2776053)[0m   File "/home/jinming/Reasoning360-MTL/verl/workers/fsdp_workers.py", line 147, in __init__
+[36m(WorkerDict pid=2776053)[0m     assert self.config.actor.ppo_mini_batch_size > 0, f"ppo_mini_batch_size {self.config.actor.ppo_mini_batch_size} should be larger than 0 after normalization"
+[36m(WorkerDict pid=2776053)[0m AssertionError: ppo_mini_batch_size 0 should be larger than 0 after normalization
+[36m(WorkerDict pid=2776054)[0m Exception raised in creation task: The actor died because of an error raised in its creation task, [36mray::exXVnwWorkerDict_0:4:WorkerDict.__init__()[39m (pid=2776054, ip=10.128.9.117, actor_id=0e6165e09c8ec54167dd3be101000000, repr=<verl.single_controller.ray.base.WorkerDict object at 0x1524f1656160>)
+[36m(WorkerDict pid=2776054)[0m   File "/home/jinming/Reasoning360-MTL/verl/single_controller/ray/base.py", line 815, in __init__
+[36m(WorkerDict pid=2776054)[0m     self.worker_dict[key] = user_defined_cls(*init_args_dict[key].get("args", ()), **init_args_dict[key].get("kwargs", {}))
+[36m(WorkerDict pid=2776054)[0m   File "/home/jinming/Reasoning360-MTL/verl/workers/fsdp_workers.py", line 147, in __init__
+[36m(WorkerDict pid=2776054)[0m     assert self.config.actor.ppo_mini_batch_size > 0, f"ppo_mini_batch_size {self.config.actor.ppo_mini_batch_size} should be larger than 0 after normalization"
+[36m(WorkerDict pid=2776054)[0m AssertionError: ppo_mini_batch_size 0 should be larger than 0 after normalization
+[36m(WorkerDict pid=2776055)[0m Exception raised in creation task: The actor died because of an error raised in its creation task, [36mray::exXVnwWorkerDict_0:5:WorkerDict.__init__()[39m (pid=2776055, ip=10.128.9.117, actor_id=80dcce7ffed1aefb9120826f01000000, repr=<verl.single_controller.ray.base.WorkerDict object at 0x1524f16f7b80>)
+[36m(WorkerDict pid=2776055)[0m   File "/home/jinming/Reasoning360-MTL/verl/single_controller/ray/base.py", line 815, in __init__
+[36m(WorkerDict pid=2776055)[0m     self.worker_dict[key] = user_defined_cls(*init_args_dict[key].get("args", ()), **init_args_dict[key].get("kwargs", {}))
+[36m(WorkerDict pid=2776055)[0m   File "/home/jinming/Reasoning360-MTL/verl/workers/fsdp_workers.py", line 147, in __init__
+[36m(WorkerDict pid=2776055)[0m     assert self.config.actor.ppo_mini_batch_size > 0, f"ppo_mini_batch_size {self.config.actor.ppo_mini_batch_size} should be larger than 0 after normalization"
+[36m(WorkerDict pid=2776055)[0m AssertionError: ppo_mini_batch_size 0 should be larger than 0 after normalization
+[36m(WorkerDict pid=2776056)[0m Exception raised in creation task: The actor died because of an error raised in its creation task, [36mray::exXVnwWorkerDict_0:6:WorkerDict.__init__()[39m (pid=2776056, ip=10.128.9.117, actor_id=ceacd378a9a8a5e22c44fd4201000000, repr=<verl.single_controller.ray.base.WorkerDict object at 0x1524f16d2070>)
+[36m(WorkerDict pid=2776056)[0m   File "/home/jinming/Reasoning360-MTL/verl/single_controller/ray/base.py", line 815, in __init__
+[36m(WorkerDict pid=2776056)[0m     self.worker_dict[key] = user_defined_cls(*init_args_dict[key].get("args", ()), **init_args_dict[key].get("kwargs", {}))
+[36m(WorkerDict pid=2776056)[0m   File "/home/jinming/Reasoning360-MTL/verl/workers/fsdp_workers.py", line 147, in __init__
+[36m(WorkerDict pid=2776056)[0m     assert self.config.actor.ppo_mini_batch_size > 0, f"ppo_mini_batch_size {self.config.actor.ppo_mini_batch_size} should be larger than 0 after normalization"
+[36m(WorkerDict pid=2776056)[0m AssertionError: ppo_mini_batch_size 0 should be larger than 0 after normalization
+[36m(WorkerDict pid=2776059)[0m Exception raised in creation task: The actor died because of an error raised in its creation task, [36mray::exXVnwWorkerDict_0:7:WorkerDict.__init__()[39m (pid=2776059, ip=10.128.9.117, actor_id=a8a2b533ce91cc01bc96016401000000, repr=<verl.single_controller.ray.base.WorkerDict object at 0x1524f56f7790>)
+[36m(WorkerDict pid=2776059)[0m   File "/home/jinming/Reasoning360-MTL/verl/single_controller/ray/base.py", line 815, in __init__
+[36m(WorkerDict pid=2776059)[0m     self.worker_dict[key] = user_defined_cls(*init_args_dict[key].get("args", ()), **init_args_dict[key].get("kwargs", {}))
+[36m(WorkerDict pid=2776059)[0m   File "/home/jinming/Reasoning360-MTL/verl/workers/fsdp_workers.py", line 147, in __init__
+[36m(WorkerDict pid=2776059)[0m     assert self.config.actor.ppo_mini_batch_size > 0, f"ppo_mini_batch_size {self.config.actor.ppo_mini_batch_size} should be larger than 0 after normalization"
+[36m(WorkerDict pid=2776059)[0m AssertionError: ppo_mini_batch_size 0 should be larger than 0 after normalization

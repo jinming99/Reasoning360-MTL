@@ -3,10 +3,10 @@
 #SBATCH --account=llmalignment
 #SBATCH --partition=a100_normal_q
 #SBATCH --nodes=1
-#SBATCH --gres=gpu:2
+#SBATCH --gres=gpu:8
 #SBATCH --cpus-per-task=32
-#SBATCH --mem=128G
-#SBATCH --time=1:00:00
+#SBATCH --mem=500G
+#SBATCH --time=12:00:00
 #SBATCH --output=guru_baseline_%j.out
 #SBATCH --error=guru_baseline_%j.err
 

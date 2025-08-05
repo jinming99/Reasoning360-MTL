@@ -83,18 +83,41 @@ def compute_edit_distance(list1, list2):
     return dp[len(list1)][len(list2)]
 
 # granular reward function
-def compute_score(solution_str, ground_truth, extra_info: any = None, method='strict', timeout: float = 10.0):
-    """The scoring function for bird puzzles task.
+def compute_score(solution_str, ground_truth, timeout=30):
+    """
+    Compute the score for a given solution string based on ground truth.
     
     Args:
-        solution_str: the solution text
-        ground_truth: dictionary containing target number and available numbers
-        method: the method to extract the solution
-        timeout: maximum time in seconds to allow for computation
+        solution_str (str): The solution string to be evaluated.
+        ground_truth: The ground truth answer for comparison.
+        timeout (int): Timeout in seconds for the computation.
+    
+    Returns:
+        float: The computed score.
     """
+    print(f"\n=== PUZZLES_DATASET COMPUTE_SCORE DEBUG START ===")
+    print(f"Debug: solution_str type: {type(solution_str)}")
+    print(f"Debug: solution_str length: {len(solution_str) if solution_str else 0}")
+    print(f"Debug: solution_str preview: {repr(solution_str[:100]) if solution_str else 'None'}...")
+    print(f"Debug: ground_truth type: {type(ground_truth)}")
+    print(f"Debug: ground_truth: {repr(str(ground_truth)[:100]) if ground_truth else 'None'}...")
+    print(f"Debug: timeout: {timeout}")
+    
     try:
         with time_limit(timeout):
-            target = ground_truth.tolist() if not isinstance(ground_truth,list) else ground_truth
+            # Handle different ground_truth formats
+            if isinstance(ground_truth, str):
+                try:
+                    # Try to parse as list if it looks like one
+                    import ast
+                    target = ast.literal_eval(ground_truth)
+                except:
+                    target = ground_truth
+            elif hasattr(ground_truth, 'tolist'):
+                target = ground_truth.tolist()
+            else:
+                target = ground_truth
+            
             predicted_arrangement = extract_solution(solution_str=solution_str)
             
             if predicted_arrangement is None:
@@ -122,4 +145,8 @@ def compute_score(solution_str, ground_truth, extra_info: any = None, method='st
         print(f"Error in compute_score in puzzles_dataset: {e}")
         score = 0.0
 
-    return {"score": score, "acc": score}
+    print(f"Debug: final score computed: {score}")
+    result = {"score": score, "acc": score}
+    print(f"Debug: returning result: {result}")
+    print(f"=== PUZZLES_DATASET COMPUTE_SCORE DEBUG END ===\n")
+    return result
